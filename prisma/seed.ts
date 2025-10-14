@@ -1,4 +1,4 @@
-import { PrismaClient } from '../app/generated/prisma'
+import { PrismaClient } from '@prisma/client'
 import bcrypt from 'bcryptjs'
 
 const prisma = new PrismaClient()
@@ -105,6 +105,68 @@ async function main() {
         update: {},
         create: {
             userId: adminUser.id,
+            shopId: shop.id
+        }
+    })
+
+    // Create sample manager user
+    const managerPassword = await bcrypt.hash('manager123', 10)
+    const managerUser = await prisma.user.upsert({
+        where: { email: 'manager@kpc.com' },
+        update: {},
+        create: {
+            email: 'manager@kpc.com',
+            username: 'manager',
+            password: managerPassword,
+            firstName: 'John',
+            lastName: 'Manager',
+            phone: '+1234567890',
+            roleId: managerRole.id
+        }
+    })
+
+    // Assign manager to default shop
+    await prisma.userShop.upsert({
+        where: {
+            userId_shopId: {
+                userId: managerUser.id,
+                shopId: shop.id
+            }
+        },
+        update: {},
+        create: {
+            userId: managerUser.id,
+            shopId: shop.id
+        }
+    })
+
+    // Create sample cashier user
+    const cashierPassword = await bcrypt.hash('cashier123', 10)
+    const cashierUser = await prisma.user.upsert({
+        where: { email: 'cashier@kpc.com' },
+        update: {},
+        create: {
+            email: 'cashier@kpc.com',
+            username: 'cashier',
+            password: cashierPassword,
+            firstName: 'Jane',
+            lastName: 'Cashier',
+            phone: '+1234567891',
+            roleId: cashierRole.id
+        }
+    })
+
+    // Assign cashier to default shop
+    await prisma.userShop.upsert({
+        where: {
+            userId_shopId: {
+                userId: cashierUser.id,
+                shopId: shop.id
+            }
+        },
+        update: {},
+        create: {
+            userId: cashierUser.id,
             shopId: shop.id
         }
     })

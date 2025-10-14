@@ -1,5 +1,14 @@
 import { prisma } from './prisma'
-import { NotificationType } from '../../app/generated/prisma'
+
+// Define the enum locally to avoid import issues
+enum NotificationType {
+    LOW_STOCK = 'LOW_STOCK',
+    OUT_OF_STOCK = 'OUT_OF_STOCK',
+    HIGH_STOCK = 'HIGH_STOCK',
+    SALE_COMPLETED = 'SALE_COMPLETED',
+    PURCHASE_RECEIVED = 'PURCHASE_RECEIVED',
+    SYSTEM_ALERT = 'SYSTEM_ALERT'
+}
 
 export interface LowStockItem {
     productId: string
@@ -28,8 +37,8 @@ export async function checkLowStock(): Promise<LowStockItem[]> {
     })
 
     return lowStockItems
-        .filter(item => item.quantity <= item.product.minStock)
-        .map(item => ({
+        .filter((item: any) => item.quantity <= item.product.minStock)
+        .map((item: any) => ({
             productId: item.productId,
             productName: item.product.name,
             sku: item.product.sku,
@@ -68,7 +77,13 @@ export async function calculateProfit(
     startDate?: Date,
     endDate?: Date
 ): Promise<ProfitCalculation> {
-    const whereClause: any = {}
+    const whereClause: {
+        shopId?: string
+        createdAt?: {
+            gte?: Date
+            lte?: Date
+        }
+    } = {}
 
     if (shopId) whereClause.shopId = shopId
     if (startDate || endDate) {

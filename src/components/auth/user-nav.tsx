@@ -3,6 +3,7 @@
 import { signOut, useSession } from "next-auth/react"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
+import { toast } from "sonner"
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -29,7 +30,7 @@ export function UserNav() {
             <DropdownMenuTrigger asChild>
                 <Button variant="ghost" className="relative h-8 w-8 rounded-full">
                     <Avatar className="h-8 w-8">
-                        <AvatarImage src={user.image || ""} alt={user.name || ""} />
+                        <AvatarImage src="" alt={user.name || ""} />
                         <AvatarFallback>{initials}</AvatarFallback>
                     </Avatar>
                 </Button>
@@ -81,7 +82,12 @@ export function UserNav() {
                 <DropdownMenuSeparator />
                 <DropdownMenuItem
                     className="cursor-pointer text-red-600 focus:text-red-600"
-                    onClick={() => signOut({ callbackUrl: "/auth/signin" })}
+                    onClick={() => {
+                        toast.success("Signed out successfully", {
+                            description: "You have been logged out. See you next time!"
+                        })
+                        signOut({ callbackUrl: "/auth/signin" })
+                    }}
                 >
                     <LogOut className="mr-2 h-4 w-4" />
                     <span>Log out</span>

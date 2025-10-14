@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { AlertTriangle } from "lucide-react"
 import Link from "next/link"
+import { Suspense } from "react"
 
 const errorMessages: Record<string, string> = {
     Configuration: "There is a problem with the server configuration.",
@@ -14,10 +15,41 @@ const errorMessages: Record<string, string> = {
     Default: "An error occurred during authentication.",
 }
 
-export default function AuthErrorPage() {
+function ErrorContent() {
     const searchParams = useSearchParams()
     const error = searchParams.get("error")
     const errorMessage = error ? errorMessages[error] || errorMessages.Default : errorMessages.Default
+
+    return (
+        <Card className="w-full max-w-md mx-auto">
+            <CardHeader className="space-y-1">
+                <CardTitle className="text-2xl font-bold text-center flex items-center justify-center gap-2">
+                    <AlertTriangle className="h-6 w-6 text-red-500" />
+                    Authentication Error
+                </CardTitle>
+                <CardDescription className="text-center">
+                    There was a problem signing you in
+                </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+                <Alert variant="destructive">
+                    <AlertDescription>{errorMessage}</AlertDescription>
+                </Alert>
+
+                <div className="space-y-2">
+                    <Button asChild className="w-full">
+                        <Link href="/auth/signin">Try Again</Link>
+                    </Button>
+                    <Button asChild variant="outline" className="w-full">
+                        <Link href="/">Go Home</Link>
+                    </Button>
+                </div>
+            </CardContent>
+        </Card>
+    )
+}
+
+export default function AuthErrorPage() {
 
     return (
         <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
@@ -27,31 +59,15 @@ export default function AuthErrorPage() {
                     <p className="text-gray-600">Multi-Shop Inventory & Sales Management</p>
                 </div>
 
-                <Card className="w-full max-w-md mx-auto">
-                    <CardHeader className="space-y-1">
-                        <CardTitle className="text-2xl font-bold text-center flex items-center justify-center gap-2">
-                            <AlertTriangle className="h-6 w-6 text-red-500" />
-                            Authentication Error
-                        </CardTitle>
-                        <CardDescription className="text-center">
-                            There was a problem signing you in
-                        </CardDescription>
-                    </CardHeader>
-                    <CardContent className="space-y-4">
-                        <Alert variant="destructive">
-                            <AlertDescription>{errorMessage}</AlertDescription>
-                        </Alert>
-
-                        <div className="space-y-2">
-                            <Button asChild className="w-full">
-                                <Link href="/auth/signin">Try Again</Link>
-                            </Button>
-                            <Button asChild variant="outline" className="w-full">
-                                <Link href="/">Go Home</Link>
-                            </Button>
-                        </div>
-                    </CardContent>
-                </Card>
+                <Suspense fallback={
+                    <Card className="w-full max-w-md mx-auto">
+                        <CardContent className="p-6">
+                            <div className="text-center">Loading...</div>
+                        </CardContent>
+                    </Card>
+                }>
+                    <ErrorContent />
+                </Suspense>
             </div>
         </div>
     )

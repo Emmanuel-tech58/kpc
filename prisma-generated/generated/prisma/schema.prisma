@@ -1,0 +1,364 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../app/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// Authentication & User Management
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  username  String   @unique
+  password  String
+  firstName String
+  lastName  String
+  phone     String?
+  avatar    String?
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relationships
+  role           Role            @relation(fields: [roleId], references: [id])
+  roleId         String
+  shops          UserShop[]
+  sales          Sale[]
+  stockMovements StockMovement[]
+  notifications  Notification[]
+
+  @@map("users")
+}
+
+model Role {
+  id          String   @id @default(cuid())
+  name        String   @unique
+  description String?
+  permissions Json // Store permissions as JSON
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relationships
+  users User[]
+
+  @@map("roles")
+}
+
+// Business & Shop Management
+model Business {
+  id          String   @id @default(cuid())
+  name        String
+  description String?
+  address     String?
+  phone       String?
+  email       String?
+  taxNumber   String?
+  currency    String   @default("USD")
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relationships
+  shops      Shop[]
+  categories Category[]
+  suppliers  Supplier[]
+
+  @@map("businesses")
+}
+
+model Shop {
+  id        String   @id @default(cuid())
+  name      String
+  address   String
+  phone     String?
+  email     String?
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relationships
+  business       Business        @relation(fields: [businessId], references: [id])
+  businessId     String
+  users          UserShop[]
+  inventory      Inventory[]
+  sales          Sale[]
+  stockMovements StockMovement[]
+
+  @@map("shops")
+}
+
+model UserShop {
+  id     String @id @default(cuid())
+  userId String
+  shopId String
+
+  // Relationships
+  user User @relation(fields: [userId], references: [id])
+  shop Shop @relation(fields: [shopId], references: [id])
+
+  @@unique([userId, shopId])
+  @@map("user_shops")
+}
+
+// Product Management
+model Category {
+  id          String   @id @default(cuid())
+  name        String
+  description String?
+  parentId    String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relationships
+  business   Business   @relation(fields: [businessId], references: [id])
+  businessId String
+  parent     Category?  @relation("CategoryHierarchy", fields: [parentId], references: [id])
+  children   Category[] @relation("CategoryHierarchy")
+  products   Product[]
+
+  @@map("categories")
+}
+
+model Supplier {
+  id          String   @id @default(cuid())
+  name        String
+  contactName String?
+  email       String?
+  phone       String?
+  address     String?
+  taxNumber   String?
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relationships
+  business   Business   @relation(fields: [businessId], references: [id])
+  businessId String
+  products   Product[]
+  purchases  Purchase[]
+
+  @@map("suppliers")
+}
+
+model Product {
+  id          String   @id @default(cuid())
+  name        String
+  description String?
+  sku         String   @unique
+  barcode     String?  @unique
+  brand       String?
+  unit        String   @default("pcs") // pcs, kg, liter, etc.
+  minStock    Int      @default(0)
+  maxStock    Int?
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relationships
+  category       Category        @relation(fields: [categoryId], references: [id])
+  categoryId     String
+  supplier       Supplier        @relation(fields: [supplierId], references: [id])
+  supplierId     String
+  inventory      Inventory[]
+  saleItems      SaleItem[]
+  purchaseItems  PurchaseItem[]
+  stockMovements StockMovement[]
+
+  @@map("products")
+}
+
+// Inventory Management
+model Inventory {
+  id           String   @id @default(cuid())
+  quantity     Int      @default(0)
+  reservedQty  Int      @default(0) // Reserved for pending sales
+  costPrice    Decimal  @db.Decimal(10, 2)
+  sellingPrice Decimal  @db.Decimal(10, 2)
+  lastUpdated  DateTime @updatedAt
+
+  // Relationships
+  product   Product @relation(fields: [productId], references: [id])
+  productId String
+  shop      Shop    @relation(fields: [shopId], references: [id])
+  shopId    String
+
+  @@unique([productId, shopId])
+  @@map("inventory")
+}
+
+model StockMovement {
+  id        String            @id @default(cuid())
+  type      StockMovementType
+  quantity  Int
+  reason    String?
+  reference String? // Reference to sale, purchase, or adjustment ID
+  createdAt DateTime          @default(now())
+
+  // Relationships
+  product   Product @relation(fields: [productId], references: [id])
+  productId String
+  shop      Shop    @relation(fields: [shopId], references: [id])
+  shopId    String
+  user      User    @relation(fields: [userId], references: [id])
+  userId    String
+
+  @@map("stock_movements")
+}
+
+enum StockMovementType {
+  IN // Stock received
+  OUT // Stock sold
+  ADJUSTMENT // Manual adjustment
+  TRANSFER // Transfer between shops
+  RETURN // Customer return
+  DAMAGE // Damaged goods
+}
+
+// Sales Management
+model Sale {
+  id            String        @id @default(cuid())
+  saleNumber    String        @unique
+  totalAmount   Decimal       @db.Decimal(10, 2)
+  discount      Decimal       @default(0) @db.Decimal(10, 2)
+  tax           Decimal       @default(0) @db.Decimal(10, 2)
+  finalAmount   Decimal       @db.Decimal(10, 2)
+  paymentMethod PaymentMethod
+  status        SaleStatus    @default(PENDING)
+  notes         String?
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+
+  // Relationships
+  shop       Shop       @relation(fields: [shopId], references: [id])
+  shopId     String
+  user       User       @relation(fields: [userId], references: [id])
+  userId     String
+  customer   Customer?  @relation(fields: [customerId], references: [id])
+  customerId String?
+  items      SaleItem[]
+
+  @@map("sales")
+}
+
+model SaleItem {
+  id         String  @id @default(cuid())
+  quantity   Int
+  unitPrice  Decimal @db.Decimal(10, 2)
+  totalPrice Decimal @db.Decimal(10, 2)
+  discount   Decimal @default(0) @db.Decimal(10, 2)
+
+  // Relationships
+  sale      Sale    @relation(fields: [saleId], references: [id])
+  saleId    String
+  product   Product @relation(fields: [productId], references: [id])
+  productId String
+
+  @@map("sale_items")
+}
+
+enum PaymentMethod {
+  CASH
+  CARD
+  BANK_TRANSFER
+  MOBILE_MONEY
+  CREDIT
+}
+
+enum SaleStatus {
+  PENDING
+  COMPLETED
+  CANCELLED
+  REFUNDED
+}
+
+// Customer Management
+model Customer {
+  id        String   @id @default(cuid())
+  name      String
+  email     String?
+  phone     String?
+  address   String?
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relationships
+  sales Sale[]
+
+  @@map("customers")
+}
+
+// Purchase Management
+model Purchase {
+  id             String         @id @default(cuid())
+  purchaseNumber String         @unique
+  totalAmount    Decimal        @db.Decimal(10, 2)
+  discount       Decimal        @default(0) @db.Decimal(10, 2)
+  tax            Decimal        @default(0) @db.Decimal(10, 2)
+  finalAmount    Decimal        @db.Decimal(10, 2)
+  status         PurchaseStatus @default(PENDING)
+  deliveryDate   DateTime?
+  notes          String?
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+
+  // Relationships
+  supplier   Supplier       @relation(fields: [supplierId], references: [id])
+  supplierId String
+  items      PurchaseItem[]
+
+  @@map("purchases")
+}
+
+model PurchaseItem {
+  id         String  @id @default(cuid())
+  quantity   Int
+  unitPrice  Decimal @db.Decimal(10, 2)
+  totalPrice Decimal @db.Decimal(10, 2)
+
+  // Relationships
+  purchase   Purchase @relation(fields: [purchaseId], references: [id])
+  purchaseId String
+  product    Product  @relation(fields: [productId], references: [id])
+  productId  String
+
+  @@map("purchase_items")
+}
+
+enum PurchaseStatus {
+  PENDING
+  ORDERED
+  RECEIVED
+  CANCELLED
+}
+
+// Notifications & Alerts
+model Notification {
+  id        String           @id @default(cuid())
+  type      NotificationType
+  title     String
+  message   String
+  isRead    Boolean          @default(false)
+  data      Json? // Additional data for the notification
+  createdAt DateTime         @default(now())
+
+  // Relationships
+  user   User   @relation(fields: [userId], references: [id])
+  userId String
+
+  @@map("notifications")
+}
+
+enum NotificationType {
+  LOW_STOCK
+  OUT_OF_STOCK
+  HIGH_STOCK
+  SALE_COMPLETED
+  PURCHASE_RECEIVED
+  SYSTEM_ALERT
+}
