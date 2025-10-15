@@ -113,10 +113,10 @@ export default function UsersPage() {
 
     const fetchShops = async () => {
         try {
-            const response = await fetch('/api/shops')
+            const response = await fetch('/api/shops?limit=100')
             if (!response.ok) throw new Error('Failed to fetch shops')
             const data = await response.json()
-            setShops(Array.isArray(data) ? data : [])
+            setShops(data.shops || [])
         } catch (error) {
             console.error('Error fetching shops:', error)
             setShops([])

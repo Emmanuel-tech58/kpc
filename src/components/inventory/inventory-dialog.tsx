@@ -362,11 +362,11 @@ export function InventoryDialog({
                             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                                 <div className="p-4 bg-gray-50 rounded-lg">
                                     <label className="text-sm font-medium text-gray-600">Cost Price</label>
-                                    <p className="text-xl font-bold text-gray-900">${inventory.costPrice}</p>
+                                    <p className="text-xl font-bold text-gray-900">MWK {inventory.costPrice}</p>
                                 </div>
                                 <div className="p-4 bg-gray-50 rounded-lg">
                                     <label className="text-sm font-medium text-gray-600">Selling Price</label>
-                                    <p className="text-xl font-bold text-gray-900">${inventory.sellingPrice}</p>
+                                    <p className="text-xl font-bold text-gray-900">MWK {inventory.sellingPrice}</p>
                                 </div>
                                 <div className="p-4 bg-gray-50 rounded-lg">
                                     <label className="text-sm font-medium text-gray-600">Margin</label>

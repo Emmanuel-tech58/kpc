@@ -11,7 +11,8 @@ import {
     AlertTriangle,
     TrendingUp,
     CheckCircle,
-    XCircle
+    XCircle,
+    BarChart3
 } from 'lucide-react'
 import { ProductDataTable } from '@/components/products/product-data-table'
 import { ProductDialog } from '@/components/products/product-dialog'
@@ -283,7 +284,206 @@ export default function InventoryPage() {
                     </div>
                 </div>
 
-                {/* Modern Filters */}
+                {/* Low Stock Alerts Detail Section */}
+                {(lowStockProducts > 0 || outOfStockProducts > 0) && (
+                    <div className="bg-white/70 backdrop-blur-sm rounded-2xl border border-white/20 shadow-xl p-6">
+                        <div className="flex items-center justify-between mb-6">
+                            <div className="flex items-center gap-3">
+                                <div className="p-2 bg-gradient-to-br from-orange-500 to-red-600 rounded-xl">
+                                    <AlertTriangle className="h-6 w-6 text-white" />
+                                </div>
+                                <div>
+                                    <h3 className="text-lg font-semibold text-gray-900">Stock Alerts</h3>
+                                    <p className="text-gray-600">Products requiring immediate attention</p>
+                                </div>
+                            </div>
+                            <Badge className="bg-red-100 text-red-800">
+                                {lowStockProducts + outOfStockProducts} items
+                            </Badge>
+                        </div>
+
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                            {products
+                                .filter(p => {
+                                    const totalStock = p.inventory.reduce((sum, inv) => sum + inv.quantity, 0)
+                                    return totalStock <= p.minStock
+                                })
+                                .slice(0, 6)
+                                .map((product) => {
+                                    const totalStock = product.inventory.reduce((sum, inv) => sum + inv.quan
+                                    const isOutOfStock = totalStock === 0
+                                    const stockPercentage = product.m
+
+                                    return (
+                                        <div key={product.id} className={`p-4 rounded-xl border ${ock
+                                                ? 'bg-red-50 border-red-200'
+                                                : 'bg-
+                                            }`}>
+                                            <div className="flex items-center justify-between mb-3">
+                                  >
+                                  
+                              
+>
+                                                <Package classNam4 ${
+                                   '
+                                                }`} />
+                                                    </div>
+                                                    <Badge className={
+                             
+                                                            ? 'bg-red-10 
+                                                            : ''
+                                                    }>
+                                                       k'}
+                                              </Badge>
+                                   iv>
+                                     v>
+  
+                                   ">
+                                                <h4 clas>
+                                                {product.sku && (
+                                                    <p className="text-xs text-gray-600">SKU: {product.sku}</p>
+                             )}
+                                                <div className="flex ju>
+                                                    <span clasn>
+                                                    <span className={`font-semibol
+                                                       00'
+                                                  }`}>
+                                   ck}
+                                        </span>
+div>
+                                   ">
+
+                                                    <span className="font-semibol
+                                                </div>
+                                   
+                                                {/* Stock Level Bar */}
+                                                <div className="mt-3">
+                                                    <div className="fle>
+                                     pan>
+/span>
+                                   
+                                                   
+                                                        <div 
+                                                            className={`h-2 rounded-full ${
+                             
+                                                                   00' 
+                                                                    : 
+                                     low-500' 
+0'
+                                                            }`}
+                                        }}
+                                                     </div>
+                                                    </div>
+                                                </div>
+                                 >
+                                        </div>
+                                    )
+                              }
+                        </div>
+
+                       > 6 && (
+
+                                <Bon 
+                                    variant="outline" 
+                                    o('low')}
+                                                    classNa"
+                                >
+                                                    View All {low
+                                </Button>
+                                        </div>
+                                    )
+                                }
+                    </div>
+                )}
+
+                        {/* Profit Analysis Section */}
+                        <div className="bg-white/70 backdrop-bp-6">
+                            <d-6">
+                      p-3">
+>
+                               " />
+                        </
+                            <div>
+                            <h3 className="text-lg fo
+                                <p className=
+                            </div>
+                        </div>
+                    </div>
+
+                  >
+
+                            <div cla
+                                <Package clas>
+                                <span className="text-sman>
+                        </div>
+                        <p className="text-xl f0">
+                  
+                  v) => {
+              )
+     
+ ters */}rn FilMode   {/*          
+    v>
+       </di         
+   </div>       
+             </div>                  >
+   n</pargiofit m-700">Prext-oranget-xs t"texsName=<p clas                  
+                </p>             
+         )()}%       }                        oFixed(1)
+ urn margin.t        ret                        0
+     ue) * 100 :Reventotal) / stue - totalCoventotalRe? ((0 > t  totalCos margin =      const                              0)
+ },                                       }, 0)
+                                    ))
+ llingPrice.ser(invumbeity * N+ (inv.quantturn invSum    re                                        
+  => {inv), ce((invSumy.redunventorp.im + n su    retur                            
+        , p) => {educe((sum.r = productsenuetotalRev     const                         0)
+           },                         
+             }, 0)                               ice))
+    nv.costPry * Number(i.quantit + (invturn invSum          re                              
+    m, inv) => {((invSutory.reduce + p.invensum     return                              
+      um, p) => {e((ss.reducroduct = pCostonst total  c                                
+  => {   {(()                          >
+    900"-orange-nt-bold text foext-xl"tlassName=       <p c             
+            </div>                       
+ argin</span>Avg M00">-6ngem text-orant-mediutext-sm fo=" className       <span                    />
+     ge-600" rantext-oh-4 w-4 assName=" cleckCircle       <Ch                        mb-2">
+ -2 gapenter ems-cex itssName="fl   <div cla                       l">
+  -xndedge-50 roup-4 bg-oranssName="div cla  <                 
+     /div>
+        <         p>
+       t</s profi>Grosle-700"urpext-p-xs tsName="text     <p clas                      </p>
+                          
+   )}eString(, 0).toLocal       }                            }, 0)
+                               t
+  um + profi invS  return                                  ty
+    quantiice)) * inv.r(inv.costPrce) - NumbesellingPriNumber(inv.fit = ( const pro                                       ) => {
+m, invce((invSuduventory.rem + p.in  return su                                  {
+ , p) =>umce((seduucts.rrod {p     MWK                           ">
+t-purple-900-bold texl fontt-x="texssName cla       <p                
+      </div>                         an>
+  </spal Profit">Potentile-600purpext-um tfont-medi-sm texte="amsNan clas         <sp                      />
+ le-600" xt-purp-4 te"h-4 wName=Chart3 class        <Bar                      
+  "> mb-2center gap-2x items-="fleclassNamediv      <                     
+  >ded-xl"le-50 roun-4 bg-purplassName="p  <div c                   
+
+     </div>                /p>
+      If all sold<">0een-70xs text-gr="text-meassNa       <p cl             
+               </p>                   ng()}
+  eStritoLocal, 0).      }                       }, 0)
+                                    )
+   lingPrice)sel Number(inv.quantity *v.+ (inn invSum     retur                                   ) => {
+ invSum, invreduce((nventory. sum + p.i     return                      {
+          => sum, p)reduce((cts.MWK {produ                      
+          ">0-90d text-greenolnt-b foe="text-xlam classN          <p                /div>
+             <               /span>
+  ue<even>Potential R00"reen-6um text-gnt-medi"text-sm fosName=<span clas                              />
+   -600"4 text-greenw--4 "hsName=p clasTrendingU  <                        
+      b-2">ter gap-2 mx items-cen"flev className=di   <                        ">
+ nded-xlreen-50 rou bg-g"p-4ssName=<div cla                       
+
+ </div>                 /p>
+       ost basis<700">Ctext-blue-text-xs Name="    <p class                      p>
+           </               
+    )}leString().toLoca, 0        }                       }, 0)                               ostPrice).cer(invumbty * Nnti (inv.quaurn invSum +  ret                        , induce((invSum.reentorysum + p.inv     return              m, p) => {duce((sucts.re{produWK      M         ue-90ext-blld tont-bo/spue< Valal Inventorye-600">Totext-blum t-mediu font600" /t-blue- texe="h-4 w-4sNam"> mb-2er gap-2x items-cente="flessNamounded-xl">-blue-50 r-4 bgame="pv classN   <di                     s-4 gap-4"d-col md:gririd-cols-1"grid g className=  <divory</p>inventyour of al overview >Financigray-600"ext-"th3></fit Analysis Value & Prory0">Invento90t-gray-semibold texnt->divhite6 w-6 text-we="h-Up classNamrending <Trounded-xl"00 o-emerald-6500 tfrom-green-ient-to-br  bg-grad"p-2Name=ass  <div cl                          gater s-centeme="flex iassNam  <div clbetween mby-stifcenter jus-x itemflessName="iv cla0 shadow-xl rder-white/2l border boed-2x-sm roundlurs} ItemsStockProducttOfouroducts + tockPS80g-white/hover:b-gray-200 er/50 bord-whiteme="bglterFisetStock => nClick={()utt">xt-center tee="mt-4div classNam        <                    s)roductockPutOfStts + okProduc {(lowStoc   })  </div            >100)}%`, ntageckPerce.min(stoMath{ width: `${    style={                 'bg-green-50   :                                                                      -yel      ? 'bg                             0 ge < 5Percentastock? 'bg-red-5 k utOfStocsO       i                             h-2">nded-full-200 roug-grayfull bssName="w-la <div civ>       </d          }%<ed(0)ntage.toFixercestockPspan>{    <                                                    k Level</sspan>Stoc        <           -1"-gray-600 mbtext-xs texteen ify-betwx just             ck}</span>toct.minS>{produray-900"ext-gd t</span>n Required:600">Miy-e="text-grasNam clas<spansmt-ween texify-betstju="flex  classNameiv       <d         </                                                          {totalSto                      ow-6 'text-yelled-600' :ck ? 'text-rOfSto isOut ${dpaurrent:</sray-600">Ct-g="texmesNa text-sm"tify-betweens                   .name}</h4uct">{produncate tr900y-graedium text-me="font-msNa"space-y-2Name= <div class                                                  di   </     </d                  Low Stock' : 't of Stocock ? 'OuStsOutOf {iyellow-80000 text-ow-1bg-yell800'-red-0 textock fSt isOutO                          t-yellow-600' : 'texed-600'text-rutOfStock ?   isO                       h-4 w-e={`   }`}                                                 llow-100'ye-100' : 'bg-redg- ? 'butOfStockisO                          nded-lg ${e={`p-1 rouv classNam <di                 er gap-2"ntce"flex items-assName=  <div cl            llow-200'order-ye0 byellow-5utOfSt   isO   : 000 ck) * 1uct.minStoock / prod(totalStStock > 0 ? in)tity, 0
                 <div className="bg-white/70 backdrop-blur-sm rounded-2xl border border-white/20 shadow-xl p-6">
                     <div className="flex flex-col lg:flex-row gap-4">
                         <div className="flex-1">
@@ -358,40 +558,40 @@ export default function InventoryPage() {
                 </div>
 
                 {/* Data Table */}
-                <div className="bg-white/70 backdrop-blur-sm rounded-2xl border border-white/20 shadow-xl">
-                    <ProductDataTable
-                        products={products}
-                        loading={loading}
-                        currentPage={currentPage}
-                        totalPages={totalPages}
-                        totalProducts={totalProducts}
-                        pageSize={pageSize}
-                        onPageChange={fetchProducts}
-                        onPageSizeChange={handlePageSizeChange}
-                        onEdit={handleEditProduct}
-                        onView={handleViewProduct}
-                        onDelete={handleDeleteProduct}
-                    />
-                </div>
+                            <div className="bg-white/70 backdrop-blur-sm rounded-2xl border border-white/20 shadow-xl">
+                                <ProductDataTable
+                                    products={products}
+                                    loading={loading}
+                                    currentPage={currentPage}
+                                    totalPages={totalPages}
+                                    totalProducts={totalProducts}
+                                    pageSize={pageSize}
+                                    onPageChange={fetchProducts}
+                                    onPageSizeChange={handlePageSizeChange}
+                                    onEdit={handleEditProduct}
+                                    onView={handleViewProduct}
+                                    onDelete={handleDeleteProduct}
+                                />
+                            </div>
 
-                {/* Dialogs */}
-                <ProductDialog
-                    open={isProductDialogOpen}
-                    onOpenChange={setIsProductDialogOpen}
-                    product={selectedProduct}
-                    mode={dialogMode}
-                    categories={categories}
-                    suppliers={suppliers}
-                    onSave={handleProductSaved}
-                />
+                            {/* Dialogs */}
+                            <ProductDialog
+                                open={isProductDialogOpen}
+                                onOpenChange={setIsProductDialogOpen}
+                                product={selectedProduct}
+                                mode={dialogMode}
+                                categories={categories}
+                                suppliers={suppliers}
+                                onSave={handleProductSaved}
+                            />
 
-                <DeleteProductDialog
-                    open={isDeleteDialogOpen}
-                    onOpenChange={setIsDeleteDialogOpen}
-                    product={selectedProduct}
-                    onDelete={handleProductDeleted}
-                />
-            </div>
+                            <DeleteProductDialog
+                                open={isDeleteDialogOpen}
+                                onOpenChange={setIsDeleteDialogOpen}
+                                product={selectedProduct}
+                                onDelete={handleProductDeleted}
+                            />
+                    </div>
         </div>
-    )
+            )
 }

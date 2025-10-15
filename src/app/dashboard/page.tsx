@@ -31,27 +31,27 @@ export default async function DashboardPage() {
                                 <h1 className="text-3xl font-semibold text-gray-900">
                                     Welcome back, {user.firstName}!
                                 </h1>
-                                <p className="text-gray-600">Here's what's happening with your inventory today.</p>
+                                <p className="text-gray-600">Here's your business overview and key metrics.</p>
                             </div>
                         </div>
                     </div>
                     <div className="flex flex-col sm:flex-row gap-3">
                         <Button asChild className="bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white shadow-lg hover:shadow-xl transition-all duration-200 px-6 py-3">
-                            <Link href="/dashboard/sales/new">
+                            <Link href="/dashboard/sales">
                                 <ShoppingCart className="mr-2 h-5 w-5" />
                                 New Sale
                             </Link>
                         </Button>
                         <Button asChild className="bg-gradient-to-r from-emerald-600 to-green-600 hover:from-emerald-700 hover:to-green-700 text-white shadow-lg hover:shadow-xl transition-all duration-200 px-6 py-3">
-                            <Link href="/dashboard/inventory/add">
+                            <Link href="/dashboard/inventory">
                                 <Package className="mr-2 h-5 w-5" />
-                                Add Product
+                                Manage Inventory
                             </Link>
                         </Button>
                     </div>
                 </div>
 
-                {/* Modern Stats Cards */}
+                {/* Enhanced Business Metrics Cards */}
                 <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
                     <div className="bg-white/70 backdrop-blur-sm rounded-2xl border border-white/20 shadow-xl p-6 hover:shadow-2xl transition-all duration-300">
                         <div className="flex items-center justify-between mb-4">
@@ -65,8 +65,42 @@ export default async function DashboardPage() {
                         </div>
                         <div className="space-y-2">
                             <p className="text-sm font-medium text-gray-600">Total Revenue</p>
-                            <p className="text-2xl font-semibold text-gray-900">$45,231.89</p>
+                            <p className="text-2xl font-semibold text-gray-900">MWK 45,231.89</p>
                             <p className="text-xs text-gray-500">from last month</p>
+                        </div>
+                    </div>
+
+                    <div className="bg-white/70 backdrop-blur-sm rounded-2xl border border-white/20 shadow-xl p-6 hover:shadow-2xl transition-all duration-300">
+                        <div className="flex items-center justify-between mb-4">
+                            <div className="p-3 bg-gradient-to-br from-blue-100 to-cyan-100 rounded-2xl">
+                                <TrendingUp className="h-8 w-8 text-blue-600" />
+                            </div>
+                            <div className="flex items-center gap-1 text-green-600 text-sm font-medium">
+                                <TrendingUp className="h-4 w-4" />
+                                +15.3%
+                            </div>
+                        </div>
+                        <div className="space-y-2">
+                            <p className="text-sm font-medium text-gray-600">Gross Profit</p>
+                            <p className="text-2xl font-semibold text-gray-900">MWK 18,092.76</p>
+                            <p className="text-xs text-gray-500">40% margin</p>
+                        </div>
+                    </div>
+
+                    <div className="bg-white/70 backdrop-blur-sm rounded-2xl border border-white/20 shadow-xl p-6 hover:shadow-2xl transition-all duration-300">
+                        <div className="flex items-center justify-between mb-4">
+                            <div className="p-3 bg-gradient-to-br from-green-100 to-emerald-100 rounded-2xl">
+                                <BarChart3 className="h-8 w-8 text-green-600" />
+                            </div>
+                            <div className="flex items-center gap-1 text-green-600 text-sm font-medium">
+                                <TrendingUp className="h-4 w-4" />
+                                +12.8%
+                            </div>
+                        </div>
+                        <div className="space-y-2">
+                            <p className="text-sm font-medium text-gray-600">Net Profit</p>
+                            <p className="text-2xl font-semibold text-green-600">MWK 9,046.38</p>
+                            <p className="text-xs text-gray-500">20% net margin</p>
                         </div>
                     </div>
 
@@ -81,165 +115,14 @@ export default async function DashboardPage() {
                             </div>
                         </div>
                         <div className="space-y-2">
-                            <p className="text-sm font-medium text-gray-600">Sales</p>
+                            <p className="text-sm font-medium text-gray-600">Sales Count</p>
                             <p className="text-2xl font-semibold text-gray-900">2,350</p>
                             <p className="text-xs text-gray-500">transactions this month</p>
                         </div>
                     </div>
-
-                    <div className="bg-white/70 backdrop-blur-sm rounded-2xl border border-white/20 shadow-xl p-6 hover:shadow-2xl transition-all duration-300">
-                        <div className="flex items-center justify-between mb-4">
-                            <div className="p-3 bg-gradient-to-br from-blue-100 to-cyan-100 rounded-2xl">
-                                <Package className="h-8 w-8 text-blue-600" />
-                            </div>
-                            <div className="flex items-center gap-1 text-blue-600 text-sm font-medium">
-                                <TrendingUp className="h-4 w-4" />
-                                +19%
-                            </div>
-                        </div>
-                        <div className="space-y-2">
-                            <p className="text-sm font-medium text-gray-600">Products</p>
-                            <p className="text-2xl font-semibold text-gray-900">12,234</p>
-                            <p className="text-xs text-gray-500">in inventory</p>
-                        </div>
-                    </div>
-
-                    <div className="bg-white/70 backdrop-blur-sm rounded-2xl border border-white/20 shadow-xl p-6 hover:shadow-2xl transition-all duration-300">
-                        <div className="flex items-center justify-between mb-4">
-                            <div className="p-3 bg-gradient-to-br from-orange-100 to-amber-100 rounded-2xl">
-                                <Store className="h-8 w-8 text-orange-600" />
-                            </div>
-                            <div className="flex items-center gap-1 text-green-600 text-sm font-medium">
-                                <Activity className="h-4 w-4" />
-                                Active
-                            </div>
-                        </div>
-                        <div className="space-y-2">
-                            <p className="text-sm font-medium text-gray-600">Active Shops</p>
-                            <p className="text-2xl font-semibold text-gray-900">{user.shops?.length || 0}</p>
-                            <p className="text-xs text-gray-500">locations</p>
-                        </div>
-                    </div>
                 </div>
 
-                {/* Main Content Grid */}
-                <div className="grid gap-6 lg:grid-cols-3">
-                    {/* Recent Sales */}
-                    <div className="lg:col-span-2 bg-white/70 backdrop-blur-sm rounded-2xl border border-white/20 shadow-xl p-6 hover:shadow-2xl transition-all duration-300">
-                        <div className="flex items-center justify-between mb-6">
-                            <div className="flex items-center gap-3">
-                                <div className="p-2 bg-gradient-to-br from-purple-500 to-indigo-600 rounded-xl">
-                                    <ShoppingCart className="h-6 w-6 text-white" />
-                                </div>
-                                <div>
-                                    <h3 className="text-lg font-semibold text-gray-900">Recent Sales</h3>
-                                    <p className="text-gray-600">You made 265 sales this month</p>
-                                </div>
-                            </div>
-                            <Button variant="outline" size="sm" asChild className="bg-white/50 border-gray-200 hover:bg-white/80 rounded-xl">
-                                <Link href="/dashboard/sales">
-                                    View All
-                                    <ArrowUpRight className="ml-2 h-4 w-4" />
-                                </Link>
-                            </Button>
-                        </div>
-
-                        <div className="space-y-4">
-                            {[1, 2, 3, 4, 5].map((i) => (
-                                <div key={i} className="flex items-center justify-between p-4 bg-white/50 rounded-xl border border-gray-100 hover:bg-white/80 transition-all duration-200">
-                                    <div className="flex items-center gap-4">
-                                        <div className="p-2 bg-gradient-to-br from-gray-100 to-gray-200 rounded-lg">
-                                            <ShoppingCart className="h-4 w-4 text-gray-600" />
-                                        </div>
-                                        <div>
-                                            <p className="font-medium text-gray-900">Sale #{1000 + i}</p>
-                                            <p className="text-sm text-gray-600">Customer {i}</p>
-                                        </div>
-                                    </div>
-                                    <div className="text-right">
-                                        <p className="font-semibold text-gray-900">+${(Math.random() * 1000).toFixed(2)}</p>
-                                        <p className="text-xs text-gray-500">
-                                            <Clock className="inline h-3 w-3 mr-1" />
-                                            {Math.floor(Math.random() * 60)} min ago
-                                        </p>
-                                    </div>
-                                </div>
-                            ))}
-                        </div>
-                    </div>
-
-                    {/* Profile & Quick Actions */}
-                    <div className="space-y-6">
-                        {/* Profile Card */}
-                        <div className="bg-white/70 backdrop-blur-sm rounded-2xl border border-white/20 shadow-xl p-6 hover:shadow-2xl transition-all duration-300">
-                            <div className="flex items-center gap-3 mb-6">
-                                <div className="p-2 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-xl">
-                                    <Users className="h-6 w-6 text-white" />
-                                </div>
-                                <div>
-                                    <h3 className="text-lg font-semibold text-gray-900">Your Profile</h3>
-                                    <p className="text-gray-600">Account information</p>
-                                </div>
-                            </div>
-
-                            <div className="space-y-4">
-                                <div className="flex items-center justify-between p-3 bg-white/50 rounded-xl">
-                                    <span className="text-sm font-medium text-gray-700">Role:</span>
-                                    <Badge className="bg-gradient-to-r from-indigo-100 to-purple-100 text-indigo-800 border-indigo-200 capitalize">
-                                        {user.role.toLowerCase()}
-                                    </Badge>
-                                </div>
-                                <div className="flex items-center justify-between p-3 bg-white/50 rounded-xl">
-                                    <span className="text-sm font-medium text-gray-700">Email:</span>
-                                    <span className="text-sm text-gray-600 truncate max-w-32">{user.email}</span>
-                                </div>
-                                <div className="flex items-center justify-between p-3 bg-white/50 rounded-xl">
-                                    <span className="text-sm font-medium text-gray-700">Username:</span>
-                                    <span className="text-sm text-gray-600">@{user.username}</span>
-                                </div>
-                            </div>
-                        </div>
-
-                        {/* Shops Card */}
-                        <div className="bg-white/70 backdrop-blur-sm rounded-2xl border border-white/20 shadow-xl p-6 hover:shadow-2xl transition-all duration-300">
-                            <div className="flex items-center gap-3 mb-4">
-                                <div className="p-2 bg-gradient-to-br from-orange-500 to-amber-600 rounded-xl">
-                                    <Store className="h-6 w-6 text-white" />
-                                </div>
-                                <div>
-                                    <h3 className="text-base font-semibold text-gray-900">Your Shops</h3>
-                                    <p className="text-gray-600 text-sm">Assigned locations</p>
-                                </div>
-                            </div>
-
-                            {user.shops && user.shops.length > 0 ? (
-                                <div className="space-y-3">
-                                    {user.shops.map((shop) => (
-                                        <div key={shop.id} className="flex items-center justify-between p-3 bg-white/50 rounded-xl border border-gray-100">
-                                            <div className="flex items-center gap-3">
-                                                <div className="p-1 bg-orange-100 rounded-lg">
-                                                    <Store className="h-4 w-4 text-orange-600" />
-                                                </div>
-                                                <span className="font-medium text-gray-800">{shop.name}</span>
-                                            </div>
-                                            <Badge className="bg-emerald-100 text-emerald-800 border-emerald-200 text-xs">
-                                                Active
-                                            </Badge>
-                                        </div>
-                                    ))}
-                                </div>
-                            ) : (
-                                <div className="text-center py-6">
-                                    <Store className="mx-auto h-12 w-12 text-gray-400 mb-3" />
-                                    <p className="text-gray-600">No shops assigned</p>
-                                    <p className="text-sm text-gray-500">Contact admin for access</p>
-                                </div>
-                            )}
-                        </div>
-                    </div>
-                </div>
-
-                {/* Low Stock Alert */}
+                {/* Stock Alerts Section */}
                 <div className="bg-white/70 backdrop-blur-sm rounded-2xl border border-white/20 shadow-xl p-6 hover:shadow-2xl transition-all duration-300">
                     <div className="flex items-center justify-between mb-6">
                         <div className="flex items-center gap-3">
@@ -247,25 +130,109 @@ export default async function DashboardPage() {
                                 <AlertTriangle className="h-6 w-6 text-white" />
                             </div>
                             <div>
-                                <h3 className="text-lg font-semibold text-gray-900">Low Stock Alert</h3>
-                                <p className="text-gray-600">Products that need restocking</p>
+                                <h3 className="text-lg font-semibold text-gray-900">Stock Alerts</h3>
+                                <p className="text-gray-600">Critical inventory levels requiring attention</p>
                             </div>
                         </div>
                         <Button variant="outline" size="sm" asChild className="bg-white/50 border-gray-200 hover:bg-white/80 rounded-xl">
-                            <Link href="/dashboard/inventory/low-stock">
-                                View All
+                            <Link href="/dashboard/inventory">
+                                Manage Stock
                                 <ArrowUpRight className="ml-2 h-4 w-4" />
                             </Link>
                         </Button>
                     </div>
 
-                    <div className="text-center py-12">
-                        <div className="p-4 bg-gradient-to-br from-emerald-100 to-green-100 rounded-2xl w-fit mx-auto mb-4">
-                            <Package className="h-12 w-12 text-emerald-600" />
+                    <div className="space-y-3">
+                        <div className="flex items-center justify-between p-4 bg-red-50 rounded-xl border border-red-200">
+                            <div className="flex items-center gap-3">
+                                <div className="p-2 bg-red-100 rounded-lg">
+                                    <Package className="h-4 w-4 text-red-600" />
+                                </div>
+                                <div>
+                                    <p className="font-medium text-gray-900">Premium Coffee Beans</p>
+                                    <p className="text-sm text-gray-600">SKU: PCB001 • Main Store</p>
+                                </div>
+                            </div>
+                            <div className="text-right">
+                                <div className="flex items-center gap-2">
+                                    <span className="text-sm text-gray-600">Stock:</span>
+                                    <span className="font-semibold text-red-600">3 / 20</span>
+                                </div>
+                                <Badge className="bg-red-100 text-red-800 text-xs">Critical</Badge>
+                            </div>
                         </div>
-                        <h4 className="text-base font-medium text-gray-900 mb-2">All Good!</h4>
-                        <p className="text-gray-600 mb-1">No low stock items at the moment</p>
-                        <p className="text-sm text-gray-500">All products are well stocked!</p>
+
+                        <div className="flex items-center justify-between p-4 bg-yellow-50 rounded-xl border border-yellow-200">
+                            <div className="flex items-center gap-3">
+                                <div className="p-2 bg-yellow-100 rounded-lg">
+                                    <Package className="h-4 w-4 text-yellow-600" />
+                                </div>
+                                <div>
+                                    <p className="font-medium text-gray-900">Organic Tea Leaves</p>
+                                    <p className="text-sm text-gray-600">SKU: OTL002 • Branch Store</p>
+                                </div>
+                            </div>
+                            <div className="text-right">
+                                <div className="flex items-center gap-2">
+                                    <span className="text-sm text-gray-600">Stock:</span>
+                                    <span className="font-semibold text-yellow-600">8 / 15</span>
+                                </div>
+                                <Badge className="bg-yellow-100 text-yellow-800 text-xs">Low</Badge>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div className="mt-4 p-3 bg-gray-50 rounded-xl">
+                        <div className="flex items-center justify-between text-sm">
+                            <span className="text-gray-600">Total items needing attention:</span>
+                            <span className="font-semibold text-gray-900">2 products</span>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Profit & Loss Summary */}
+                <div className="bg-white/70 backdrop-blur-sm rounded-2xl border border-white/20 shadow-xl p-6 hover:shadow-2xl transition-all duration-300">
+                    <div className="flex items-center justify-between mb-6">
+                        <div className="flex items-center gap-3">
+                            <div className="p-2 bg-gradient-to-br from-purple-500 to-indigo-600 rounded-xl">
+                                <BarChart3 className="h-6 w-6 text-white" />
+                            </div>
+                            <div>
+                                <h3 className="text-lg font-semibold text-gray-900">Profit & Loss Summary</h3>
+                                <p className="text-gray-600">Current month financial overview</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div className="space-y-4">
+                            <div className="flex justify-between items-center py-2 border-b border-gray-200">
+                                <span className="text-gray-600">Revenue</span>
+                                <span className="font-semibold text-green-600">MWK 45,231.89</span>
+                            </div>
+                            <div className="flex justify-between items-center py-2 border-b border-gray-200">
+                                <span className="text-gray-600">Less: Cost of Goods</span>
+                                <span className="font-semibold text-red-600">MWK 27,139.13</span>
+                            </div>
+                            <div className="flex justify-between items-center py-2 border-b border-gray-200">
+                                <span className="text-gray-600">Gross Profit</span>
+                                <span className="font-semibold text-blue-600">MWK 18,092.76</span>
+                            </div>
+                        </div>
+                        <div className="space-y-4">
+                            <div className="flex justify-between items-center py-2 border-b border-gray-200">
+                                <span className="text-gray-600">Less: Operating Expenses</span>
+                                <span className="font-semibold text-red-600">MWK 9,046.38</span>
+                            </div>
+                            <div className="flex justify-between items-center py-2 border-b border-gray-200">
+                                <span className="text-gray-600">Net Profit</span>
+                                <span className="font-semibold text-green-600">MWK 9,046.38</span>
+                            </div>
+                            <div className="flex justify-between items-center py-2 border-b border-gray-200">
+                                <span className="text-gray-600">Profit Margin</span>
+                                <span className="font-semibold text-purple-600">20.0%</span>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>

@@ -29,7 +29,8 @@ import {
     AlertTriangle,
     Tags,
     ChevronRight,
-    Shield
+    Shield,
+    ArrowUpDown
 } from "lucide-react"
 import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
@@ -49,6 +50,7 @@ const sidebarItems = [
         items: [
             { title: "All Products", href: "/dashboard/inventory", icon: Package, color: "text-inventory-green" },
             { title: "Inventory Management", href: "/dashboard/inventory-management", icon: TrendingUp, color: "text-green-600" },
+            { title: "Stock Movements", href: "/dashboard/stock-movements", icon: ArrowUpDown, color: "text-blue-600" },
             { title: "Categories", href: "/dashboard/categories", icon: Tags, color: "text-orange-600" },
             { title: "Add Product", href: "/dashboard/inventory/add", icon: Plus, color: "text-inventory-green" },
             { title: "Low Stock", href: "/dashboard/inventory/low-stock", icon: AlertTriangle, color: "text-inventory-orange" },
@@ -61,7 +63,7 @@ const sidebarItems = [
         items: [
             { title: "All Sales", href: "/dashboard/sales", icon: Receipt, color: "text-inventory-purple" },
             { title: "New Sale", href: "/dashboard/sales/new", icon: Plus, color: "text-inventory-purple" },
-            { title: "Reports", href: "/dashboard/sales/reports", icon: BarChart3, color: "text-inventory-purple" },
+            { title: "Sales Reports", href: "/dashboard/reports", icon: BarChart3, color: "text-inventory-purple" },
         ]
     },
     {
@@ -95,8 +97,8 @@ const sidebarItems = [
         color: "text-purple-600"
     },
     {
-        title: "Analytics",
-        href: "/dashboard/analytics",
+        title: "Reports & Analytics",
+        href: "/dashboard/reports",
         icon: TrendingUp,
         description: "Business insights and reports",
         color: "text-inventory-yellow"
@@ -244,9 +246,9 @@ export function AdminLayout({ children }: AdminLayoutProps) {
 
     return (
         <TooltipProvider>
-            <div className="flex h-screen bg-background">
+            <div className="flex h-screen bg-background overflow-hidden">
                 {/* Desktop Sidebar */}
-                <div className="hidden w-64 border-r bg-card lg:block">
+                <div className="hidden w-64 border-r bg-card lg:block flex-shrink-0">
                     <SidebarContent />
                 </div>
 
@@ -258,9 +260,9 @@ export function AdminLayout({ children }: AdminLayoutProps) {
                 </Sheet>
 
                 {/* Main Content */}
-                <div className="flex flex-1 flex-col overflow-hidden">
+                <div className="flex flex-1 flex-col min-h-0">
                     {/* Top Navigation */}
-                    <header className="flex h-16 items-center border-b bg-gradient-to-r from-white to-gray-50 px-6 shadow-sm">
+                    <header className="flex h-16 items-center border-b bg-gradient-to-r from-white to-gray-50 px-6 shadow-sm flex-shrink-0">
                         <div className="flex items-center space-x-4">
                             {/* Mobile Menu Button */}
                             <Sheet>
@@ -315,7 +317,7 @@ export function AdminLayout({ children }: AdminLayoutProps) {
                     </header>
 
                     {/* Page Content */}
-                    <main className="flex-1 overflow-auto p-6">
+                    <main className="flex-1 overflow-y-auto p-6 min-h-0">
                         {children}
                     </main>
                 </div>
