@@ -233,8 +233,13 @@ export function SalesDialog({
         return formData.items.reduce((sum, item) => sum + calculateItemTotal(item), 0)
     }
 
+    const calculateTax = () => {
+        const subtotal = calculateSubTotal()
+        return subtotal * 0.165 // 16.5% VAT for Malawi
+    }
+
     const calculateTotal = () => {
-        return calculateSubTotal()
+        return calculateSubTotal() + calculateTax()
     }
 
     const validateForm = () => {
@@ -593,7 +598,15 @@ export function SalesDialog({
                                 <div className="space-y-4">
                                     <div className="p-4 bg-gray-50 rounded-lg">
                                         <div className="space-y-2">
-                                            <div className="flex justify-between font-bold text-lg">
+                                            <div className="flex justify-between text-sm">
+                                                <span>Subtotal:</span>
+                                                <span>MWK {calculateSubTotal().toFixed(2)}</span>
+                                            </div>
+                                            <div className="flex justify-between text-sm">
+                                                <span>VAT (16.5%):</span>
+                                                <span>MWK {calculateTax().toFixed(2)}</span>
+                                            </div>
+                                            <div className="flex justify-between font-bold text-lg border-t pt-2">
                                                 <span>Total:</span>
                                                 <span>MWK {calculateTotal().toFixed(2)}</span>
                                             </div>

@@ -152,7 +152,11 @@ export async function POST(request: NextRequest) {
             }
         })
 
-        const finalAmount = totalAmount
+        // Calculate tax (you can make this configurable per business)
+        // For Malawi, VAT is typically 16.5%
+        const taxRate = 0.165 // 16.5% VAT
+        const taxAmount = totalAmount * taxRate
+        const finalAmount = totalAmount + taxAmount
 
         // Create sale with items in a transaction
         const sale = await prisma.$transaction(async (tx) => {
@@ -161,8 +165,8 @@ export async function POST(request: NextRequest) {
                 data: {
                     saleNumber,
                     totalAmount,
-                    discount: 0,
-                    tax: 0,
+                    discount: 0, // TODO: Implement sale-level discounts
+                    tax: taxAmount,
                     finalAmount,
                     paymentMethod: validatedData.paymentMethod,
                     status: 'COMPLETED',
