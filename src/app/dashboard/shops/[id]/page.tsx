@@ -30,7 +30,7 @@ interface ShopMetrics {
 
 export default function ShopDetailsPage() {
     const params = useParams()
-    const shopId = params.shopId as string
+    const shopId = params.id as string
 
     const [shop, setShop] = useState<Shop | null>(null)
     const [metrics, setMetrics] = useState<ShopMetrics | null>(null)
@@ -38,8 +38,15 @@ export default function ShopDetailsPage() {
 
     useEffect(() => {
         if (shopId) {
-            fetchShopDetails()
-            fetchShopMetrics()
+            const loadData = async () => {
+                setLoading(true)
+                await Promise.all([
+                    fetchShopDetails(),
+                    fetchShopMetrics()
+                ])
+                setLoading(false)
+            }
+            loadData()
         }
     }, [shopId])
 
@@ -48,7 +55,7 @@ export default function ShopDetailsPage() {
             const response = await fetch(`/api/shops/${shopId}`)
             if (!response.ok) throw new Error('Failed to fetch shop details')
             const data = await response.json()
-            setShop(data.shop)
+            setShop(data)
         } catch (error) {
             console.error(error)
             toast.error('Failed to load shop details.')
@@ -64,8 +71,6 @@ export default function ShopDetailsPage() {
         } catch (error) {
             console.error(error)
             toast.error('Failed to load shop metrics.')
-        } finally {
-            setLoading(false)
         }
     }
 

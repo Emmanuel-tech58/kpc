@@ -17,12 +17,13 @@ const updateUserSchema = z.object({
 
 export async function GET(
     request: NextRequest,
-    { params }: { params: { id: string } }
+    { params }: { params: Promise<{ id: string }> }
 ) {
     try {
+        const { id } = await params
         const user = await prisma.user.findUnique({
             where: {
-                id: params.id,
+                id,
                 deletedAt: null // Only find non-deleted users
             },
             include: {
@@ -63,16 +64,17 @@ export async function GET(
 
 export async function PUT(
     request: NextRequest,
-    { params }: { params: { id: string } }
+    { params }: { params: Promise<{ id: string }> }
 ) {
     try {
+        const { id } = await params
         const body = await request.json()
         const validatedData = updateUserSchema.parse(body)
 
         // Check if user exists and is not deleted
         const existingUser = await prisma.user.findUnique({
             where: {
-                id: params.id,
+                id,
                 deletedAt: null // Only find non-deleted users
             }
         })
@@ -89,7 +91,7 @@ export async function PUT(
             const duplicateUser = await prisma.user.findFirst({
                 where: {
                     AND: [
-                        { id: { not: params.id } },
+                        { id: { not: id } },
                         { deletedAt: null }, // Only check active users
                         {
                             OR: [
@@ -120,7 +122,7 @@ export async function PUT(
 
         // Update user
         const user = await prisma.user.update({
-            where: { id: params.id },
+            where: { id },
             data: updateData,
             include: {
                 role: true
@@ -131,14 +133,14 @@ export async function PUT(
         if (validatedData.shopIds !== undefined) {
             // Remove existing shop assignments
             await prisma.userShop.deleteMany({
-                where: { userId: params.id }
+                where: { userId: id }
             })
 
             // Add new shop assignments
             if (validatedData.shopIds.length > 0) {
                 await prisma.userShop.createMany({
                     data: validatedData.shopIds.map(shopId => ({
-                        userId: params.id,
+                        userId: id,
                         shopId
                     }))
                 })
@@ -167,13 +169,14 @@ export async function PUT(
 
 export async function DELETE(
     request: NextRequest,
-    { params }: { params: { id: string } }
+    { params }: { params: Promise<{ id: string }> }
 ) {
     try {
+        const { id } = await params
         // Check if user exists and is not already deleted
         const existingUser = await prisma.user.findUnique({
             where: {
-                id: params.id,
+                id,
                 deletedAt: null // Only find non-deleted users
             },
             include: {
@@ -195,7 +198,7 @@ export async function DELETE(
 
         // Always perform soft delete
         const user = await prisma.user.update({
-            where: { id: params.id },
+            where: { id },
             data: {
                 isActive: false,
                 deletedAt: new Date(),

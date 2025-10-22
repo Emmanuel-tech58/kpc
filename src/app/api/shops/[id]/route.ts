@@ -14,7 +14,7 @@ const updateShopSchema = z.object({
 
 export async function GET(
     request: NextRequest,
-    { params }: { params: { id: string } }
+    { params }: { params: Promise<{ id: string }> }
 ) {
     try {
         // Get user session
@@ -26,8 +26,9 @@ export async function GET(
             )
         }
 
+        const { id } = await params
         const shop = await prisma.shop.findUnique({
-            where: { id: params.id },
+            where: { id },
             include: {
                 business: {
                     select: {
@@ -101,7 +102,7 @@ export async function GET(
 
 export async function PUT(
     request: NextRequest,
-    { params }: { params: { id: string } }
+    { params }: { params: Promise<{ id: string }> }
 ) {
     try {
         // Get user session
@@ -113,12 +114,13 @@ export async function PUT(
             )
         }
 
+        const { id } = await params
         const body = await request.json()
         const validatedData = updateShopSchema.parse(body)
 
         // Check if shop exists
         const existingShop = await prisma.shop.findUnique({
-            where: { id: params.id }
+            where: { id }
         })
 
         if (!existingShop) {
@@ -134,7 +136,7 @@ export async function PUT(
                 where: {
                     name: validatedData.name,
                     businessId: existingShop.businessId,
-                    id: { not: params.id }
+                    id: { not: id }
                 }
             })
 
@@ -147,7 +149,7 @@ export async function PUT(
         }
 
         const shop = await prisma.shop.update({
-            where: { id: params.id },
+            where: { id },
             data: validatedData,
             include: {
                 business: {
@@ -196,7 +198,7 @@ export async function PUT(
 
 export async function DELETE(
     request: NextRequest,
-    { params }: { params: { id: string } }
+    { params }: { params: Promise<{ id: string }> }
 ) {
     try {
         // Get user session
@@ -208,9 +210,10 @@ export async function DELETE(
             )
         }
 
+        const { id } = await params
         // Check if shop exists
         const existingShop = await prisma.shop.findUnique({
-            where: { id: params.id },
+            where: { id },
             include: {
                 _count: {
                     select: {
@@ -233,7 +236,7 @@ export async function DELETE(
         if (existingShop._count.inventory > 0 || existingShop._count.sales > 0 || existingShop._count.stockMovements > 0) {
             // Soft delete - just deactivate
             const shop = await prisma.shop.update({
-                where: { id: params.id },
+                where: { id },
                 data: { isActive: false }
             })
 
@@ -244,7 +247,7 @@ export async function DELETE(
         } else {
             // Hard delete if no related data
             await prisma.shop.delete({
-                where: { id: params.id }
+                where: { id }
             })
 
             return NextResponse.json({

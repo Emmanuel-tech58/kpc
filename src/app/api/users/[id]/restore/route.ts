@@ -3,13 +3,14 @@ import { prisma } from '@/lib/prisma'
 
 export async function POST(
     request: NextRequest,
-    { params }: { params: { id: string } }
+    { params }: { params: Promise<{ id: string }> }
 ) {
     try {
+        const { id } = await params
         // Check if user exists and is deleted
         const existingUser = await prisma.user.findUnique({
             where: {
-                id: params.id,
+                id,
                 deletedAt: { not: null } // Only find deleted users
             }
         })
@@ -25,7 +26,7 @@ export async function POST(
         const conflictingUser = await prisma.user.findFirst({
             where: {
                 AND: [
-                    { id: { not: params.id } },
+                    { id: { not: id } },
                     { deletedAt: null },
                     {
                         OR: [
@@ -46,7 +47,7 @@ export async function POST(
 
         // Restore user
         const user = await prisma.user.update({
-            where: { id: params.id },
+            where: { id },
             data: {
                 isActive: true,
                 deletedAt: null,
