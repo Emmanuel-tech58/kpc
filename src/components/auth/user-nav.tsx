@@ -86,7 +86,7 @@ export function UserNav() {
                         toast.success("Signed out successfully", {
                             description: "You have been logged out. See you next time!"
                         })
-                        signOut({ callbackUrl: "/auth/signin" })
+                        signOut({ callbackUrl: "/" })
                     }}
                 >
                     <LogOut className="mr-2 h-4 w-4" />

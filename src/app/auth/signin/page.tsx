@@ -12,16 +12,18 @@ export default function SignInPage() {
             {/* Animated Background Elements */}
             <div className="absolute inset-0">
                 <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-blue-600/20 via-purple-600/20 to-pink-600/20"></div>
-                
+
                 {/* Floating Geometric Shapes */}
                 <div className="absolute top-20 left-20 w-64 h-64 bg-gradient-to-r from-cyan-400/30 to-blue-500/30 rounded-full blur-3xl animate-pulse"></div>
                 <div className="absolute top-40 right-32 w-48 h-48 bg-gradient-to-r from-purple-400/40 to-pink-500/40 rounded-full blur-2xl animate-bounce"></div>
                 <div className="absolute bottom-32 left-40 w-56 h-56 bg-gradient-to-r from-indigo-400/30 to-purple-500/30 rounded-full blur-3xl animate-pulse"></div>
                 <div className="absolute bottom-20 right-20 w-40 h-40 bg-gradient-to-r from-pink-400/40 to-red-500/40 rounded-full blur-2xl animate-bounce"></div>
-                
+
                 {/* Grid Pattern */}
-                <div className="absolute inset-0 bg-[url('data:image/svg+xml,%3Csvg width="60" height="60" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg"%3E%3Cg fill="none" fill-rule="evenodd"%3E%3Cg fill="%23ffffff" fill-opacity="0.05"%3E%3Ccircle cx="30" cy="30" r="1"/%3E%3C/g%3E%3C/g%3E%3C/svg%3E')] opacity-40"></div>
-                
+                <div className="absolute inset-0 opacity-40" style={{
+                    backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.05'%3E%3Ccircle cx='30' cy='30' r='1'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`
+                }}></div>
+
                 {/* Gradient Overlays */}
                 <div className="absolute top-0 left-0 w-1/3 h-full bg-gradient-to-r from-cyan-500/10 to-transparent"></div>
                 <div className="absolute top-0 right-0 w-1/3 h-full bg-gradient-to-l from-pink-500/10 to-transparent"></div>
@@ -32,13 +34,13 @@ export default function SignInPage() {
                 {/* Left side - Creative Branding */}
                 <div className="hidden lg:flex lg:w-1/2 relative overflow-hidden">
                     <div className="absolute inset-0 bg-gradient-to-br from-black/40 via-purple-900/30 to-black/40"></div>
-                    
+
                     {/* Animated Elements */}
                     <div className="absolute top-10 left-10 w-20 h-20 border-2 border-cyan-400/50 rounded-lg rotate-45 animate-spin"></div>
                     <div className="absolute top-32 right-16 w-16 h-16 border-2 border-pink-400/50 rounded-full animate-pulse"></div>
                     <div className="absolute bottom-40 left-16 w-12 h-12 bg-gradient-to-r from-purple-400 to-pink-400 rounded-full animate-bounce"></div>
                     <div className="absolute bottom-20 right-32 w-8 h-8 bg-gradient-to-r from-cyan-400 to-blue-400 rounded-full animate-ping"></div>
-                    
+
                     <div className="relative z-10 flex flex-col justify-center px-12 text-white">
                         <div className="mb-12">
                             <div className="flex items-center mb-8">
@@ -54,12 +56,12 @@ export default function SignInPage() {
                                     <div className="w-32 h-1 bg-gradient-to-r from-cyan-400 to-purple-500 rounded-full mt-2"></div>
                                 </div>
                             </div>
-                            
+
                             <h2 className="text-5xl font-bold mb-6 leading-tight bg-gradient-to-r from-white via-cyan-100 to-purple-100 bg-clip-text text-transparent">
                                 Transform Your Business
                             </h2>
                             <p className="text-xl text-gray-200 mb-10 leading-relaxed">
-                                Experience the future of inventory management with our cutting-edge platform. 
+                                Experience the future of inventory management with our cutting-edge platform.
                                 Streamline operations, boost productivity, and unlock your business potential.
                             </p>
                         </div>
@@ -96,7 +98,7 @@ export default function SignInPage() {
                 {/* Right side - Login Form */}
                 <div className="flex-1 flex items-center justify-center px-4 sm:px-6 lg:px-8 relative">
                     <div className="absolute inset-0 bg-gradient-to-br from-white/10 via-purple-500/5 to-pink-500/10 backdrop-blur-sm"></div>
-                    
+
                     <div className="w-full max-w-md relative z-10">
                         <div className="lg:hidden text-center mb-10">
                             <div className="flex items-center justify-center mb-6">
