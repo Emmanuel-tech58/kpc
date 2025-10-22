@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -19,24 +19,32 @@ import { toast } from 'sonner'
 
 export default function SettingsPage() {
     const [loading, setLoading] = useState(false)
+    const [initialLoading, setInitialLoading] = useState(true)
     const [activeTab, setActiveTab] = useState('profile')
 
     const [profileData, setProfileData] = useState({
-        firstName: 'John',
-        lastName: 'Doe',
-        email: 'john@example.com',
-        phone: '+265 999 123 456',
-        address: 'Blantyre, Malawi'
+        firstName: '',
+        lastName: '',
+        email: '',
+        phone: '',
+        address: ''
     })
 
     const [businessData, setBusinessData] = useState({
-        businessName: 'My Business',
+        businessName: '',
         businessType: 'Retail',
-        address: 'Blantyre, Malawi',
-        phone: '+265 999 123 456',
-        email: 'business@example.com',
+        address: '',
+        phone: '',
+        email: '',
         currency: 'MWK',
-        taxId: 'TAX123456'
+        taxId: '',
+        enableVat: false,
+        vatRate: 16.5,
+        vatNumber: '',
+        includeOperatingExpenses: false,
+        trackPurchaseOrders: true,
+        multiCurrency: false,
+        fiscalYearStart: 'january'
     })
 
     const [notifications, setNotifications] = useState({
@@ -47,16 +55,89 @@ export default function SettingsPage() {
         reports: false
     })
 
+    // Load settings on component mount
+    useEffect(() => {
+        loadSettings()
+    }, [])
+
+    const loadSettings = async () => {
+        try {
+            // Load business settings
+            const settingsResponse = await fetch('/api/settings')
+            if (settingsResponse.ok) {
+                const settingsData = await settingsResponse.json()
+                if (settingsData.settings) {
+                    setBusinessData(prev => ({ ...prev, ...settingsData.settings }))
+                }
+            }
+
+            // Load user profile data
+            const profileResponse = await fetch('/api/user/profile')
+            if (profileResponse.ok) {
+                const profileData = await profileResponse.json()
+                if (profileData.user) {
+                    setProfileData({
+                        firstName: profileData.user.firstName || '',
+                        lastName: profileData.user.lastName || '',
+                        email: profileData.user.email || '',
+                        phone: profileData.user.phone || '',
+                        address: profileData.user.address || ''
+                    })
+                }
+            }
+        } catch (error) {
+            console.error('Error loading settings:', error)
+            toast.error('Failed to load settings')
+        } finally {
+            setInitialLoading(false)
+        }
+    }
+
     const handleSave = async () => {
         setLoading(true)
         try {
-            await new Promise(resolve => setTimeout(resolve, 1000))
-            toast.success('Settings saved successfully')
+            // Save business settings
+            const settingsResponse = await fetch('/api/settings', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(businessData)
+            })
+
+            // Save profile data
+            const profileResponse = await fetch('/api/user/profile', {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(profileData)
+            })
+
+            if (settingsResponse.ok && profileResponse.ok) {
+                toast.success('Settings saved successfully')
+            } else {
+                throw new Error('Failed to save settings')
+            }
         } catch (error) {
+            console.error('Error saving settings:', error)
             toast.error('Failed to save settings')
         } finally {
             setLoading(false)
         }
+    }
+
+    if (initialLoading) {
+        return (
+            <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
+                <div className="max-w-7xl mx-auto p-6">
+                    <div className="flex items-center justify-center py-12">
+                        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
+                        <p className="ml-3 text-gray-600">Loading settings...</p>
+                    </div>
+                </div>
+            </div>
+        )
     }
 
     return (
@@ -83,6 +164,7 @@ export default function SettingsPage() {
                             {[
                                 { id: 'profile', name: 'Profile', icon: User },
                                 { id: 'business', name: 'Business', icon: Building },
+                                { id: 'accounting', name: 'Accounting', icon: Settings },
                                 { id: 'notifications', name: 'Notifications', icon: Bell },
                                 { id: 'preferences', name: 'Preferences', icon: Palette },
                                 { id: 'security', name: 'Security', icon: Shield }
@@ -91,8 +173,8 @@ export default function SettingsPage() {
                                     key={tab.id}
                                     onClick={() => setActiveTab(tab.id)}
                                     className={`flex items-center gap-2 py-4 px-1 border-b-2 font-medium text-sm ${activeTab === tab.id
-                                            ? 'border-blue-500 text-blue-600'
-                                            : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                                        ? 'border-blue-500 text-blue-600'
+                                        : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
                                         }`}
                                 >
                                     <tab.icon className="h-4 w-4" />
@@ -253,6 +335,136 @@ export default function SettingsPage() {
                                                 onChange={(e) => setBusinessData({ ...businessData, taxId: e.target.value })}
                                             />
                                         </div>
+                                    </CardContent>
+                                </Card>
+
+                                <Card>
+                                    <CardHeader>
+                                        <CardTitle>Tax & Accounting Settings</CardTitle>
+                                        <CardDescription>Configure VAT and tax calculations for your business</CardDescription>
+                                    </CardHeader>
+                                    <CardContent className="space-y-4">
+                                        <div className="flex items-center justify-between">
+                                            <div>
+                                                <h4 className="font-medium">Enable VAT/Tax Calculations</h4>
+                                                <p className="text-sm text-gray-600">Automatically add VAT to sales transactions</p>
+                                            </div>
+                                            <Switch
+                                                checked={businessData.enableVat}
+                                                onCheckedChange={(checked) => setBusinessData({ ...businessData, enableVat: checked })}
+                                            />
+                                        </div>
+                                        {businessData.enableVat && (
+                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                                <div>
+                                                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                                                        VAT Rate (%)
+                                                    </label>
+                                                    <Input
+                                                        type="number"
+                                                        step="0.1"
+                                                        min="0"
+                                                        max="100"
+                                                        value={businessData.vatRate}
+                                                        onChange={(e) => setBusinessData({ ...businessData, vatRate: parseFloat(e.target.value) || 0 })}
+                                                        placeholder="16.5"
+                                                    />
+                                                    <p className="text-xs text-gray-500 mt-1">Standard VAT rate in Malawi is 16.5%</p>
+                                                </div>
+                                                <div>
+                                                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                                                        VAT Number
+                                                    </label>
+                                                    <Input
+                                                        value={businessData.vatNumber}
+                                                        onChange={(e) => setBusinessData({ ...businessData, vatNumber: e.target.value })}
+                                                        placeholder="VAT123456789"
+                                                    />
+                                                </div>
+                                            </div>
+                                        )}
+                                        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                                            <h5 className="font-medium text-blue-900 mb-2">VAT Configuration Options:</h5>
+                                            <ul className="text-sm text-blue-800 space-y-1">
+                                                <li>• <strong>Enabled:</strong> VAT will be automatically calculated and added to all sales</li>
+                                                <li>• <strong>Disabled:</strong> Prices entered are treated as final prices (VAT inclusive if applicable)</li>
+                                                <li>• You can change this setting anytime based on your business needs</li>
+                                                <li>• When disabled, you can still manually include VAT in your product prices</li>
+                                            </ul>
+                                        </div>
+                                    </CardContent>
+                                </Card>
+                            </div>
+                        )}
+
+                        {/* Accounting Tab */}
+                        {activeTab === 'accounting' && (
+                            <div className="space-y-6">
+                                <Card>
+                                    <CardHeader>
+                                        <CardTitle>Accounting Preferences</CardTitle>
+                                        <CardDescription>Configure how your business handles accounting and financial calculations</CardDescription>
+                                    </CardHeader>
+                                    <CardContent className="space-y-4">
+                                        <div className="flex items-center justify-between">
+                                            <div>
+                                                <h4 className="font-medium">Include Operating Expenses in Reports</h4>
+                                                <p className="text-sm text-gray-600">Track additional business expenses beyond inventory costs</p>
+                                            </div>
+                                            <Switch
+                                                checked={businessData.includeOperatingExpenses}
+                                                onCheckedChange={(checked) => setBusinessData({ ...businessData, includeOperatingExpenses: checked })}
+                                            />
+                                        </div>
+                                        <div className="flex items-center justify-between">
+                                            <div>
+                                                <h4 className="font-medium">Track Purchase Orders</h4>
+                                                <p className="text-sm text-gray-600">Enable purchase order management for better inventory control</p>
+                                            </div>
+                                            <Switch
+                                                checked={businessData.trackPurchaseOrders}
+                                                onCheckedChange={(checked) => setBusinessData({ ...businessData, trackPurchaseOrders: checked })}
+                                            />
+                                        </div>
+                                        <div className="flex items-center justify-between">
+                                            <div>
+                                                <h4 className="font-medium">Multi-Currency Support</h4>
+                                                <p className="text-sm text-gray-600">Handle transactions in multiple currencies</p>
+                                            </div>
+                                            <Switch
+                                                checked={businessData.multiCurrency}
+                                                onCheckedChange={(checked) => setBusinessData({ ...businessData, multiCurrency: checked })}
+                                            />
+                                        </div>
+                                        <div>
+                                            <label className="block text-sm font-medium text-gray-700 mb-1">
+                                                Fiscal Year Start
+                                            </label>
+                                            <select
+                                                value={businessData.fiscalYearStart}
+                                                onChange={(e) => setBusinessData({ ...businessData, fiscalYearStart: e.target.value })}
+                                                className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                                            >
+                                                <option value="january">January</option>
+                                                <option value="april">April</option>
+                                                <option value="july">July</option>
+                                                <option value="october">October</option>
+                                            </select>
+                                        </div>
+                                    </CardContent>
+                                </Card>
+                            </div>
+                        )}
+
+                        {/* Notifications Tab */}
+                        {activeTab === 'notifications' && (
+                            <div className="space-y-6">
+                                <Card>
+                                    <CardHeader>
+                                        <CardTitle>Notification Preferences</CardTitle>
+                                        <CardDescription>Choose what notifications you want to receive</CardDescription>
+                                    </CardHeader>
+                                    <CardContent className="space-y-6">
                                     </CardContent>
                                 </Card>
                             </div>

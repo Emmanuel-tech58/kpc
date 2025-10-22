@@ -27,12 +27,14 @@ model User {
   updatedAt DateTime  @updatedAt
 
   // Relationships
-  role           Role            @relation(fields: [roleId], references: [id])
-  roleId         String
-  shops          UserShop[]
-  sales          Sale[]
-  stockMovements StockMovement[]
-  notifications  Notification[]
+  role              Role               @relation(fields: [roleId], references: [id])
+  roleId            String
+  shops             UserShop[]
+  sales             Sale[]
+  stockMovements    StockMovement[]
+  notifications     Notification[]
+  businessSettings  BusinessSettings?
+  operatingExpenses OperatingExpense[]
 
   @@map("users")
 }
@@ -362,4 +364,57 @@ enum NotificationType {
   SALE_COMPLETED
   PURCHASE_RECEIVED
   SYSTEM_ALERT
+}
+
+// Business Settings
+model BusinessSettings {
+  id                       String   @id @default(cuid())
+  businessName             String?
+  businessType             String?
+  address                  String?
+  phone                    String?
+  email                    String?
+  currency                 String   @default("MWK")
+  taxId                    String?
+  enableVat                Boolean  @default(false)
+  vatRate                  Decimal  @default(16.5) @db.Decimal(5, 2)
+  vatNumber                String?
+  includeOperatingExpenses Boolean  @default(false)
+  trackPurchaseOrders      Boolean  @default(true)
+  multiCurrency            Boolean  @default(false)
+  fiscalYearStart          String   @default("january")
+  createdAt                DateTime @default(now())
+  updatedAt                DateTime @updatedAt
+
+  // Relationships
+  user   User   @relation(fields: [userId], references: [id])
+  userId String @unique
+
+  @@map("business_settings")
+}
+
+// Operating Expenses
+model OperatingExpense {
+  id              String                  @id @default(cuid())
+  description     String
+  amount          Decimal                 @db.Decimal(10, 2)
+  category        String
+  date            DateTime
+  notes           String?
+  isRecurring     Boolean                 @default(false)
+  recurringPeriod OperatingExpensePeriod?
+  createdAt       DateTime                @default(now())
+  updatedAt       DateTime                @updatedAt
+
+  // Relationships
+  user   User   @relation(fields: [userId], references: [id])
+  userId String
+
+  @@map("operating_expenses")
+}
+
+enum OperatingExpensePeriod {
+  MONTHLY
+  QUARTERLY
+  YEARLY
 }

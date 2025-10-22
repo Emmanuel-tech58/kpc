@@ -152,11 +152,20 @@ export async function POST(request: NextRequest) {
             }
         })
 
-        // Calculate tax (you can make this configurable per business)
-        // For Malawi, VAT is typically 16.5%
-        const taxRate = 0.165 // 16.5% VAT
-        const taxAmount = totalAmount * taxRate
-        const finalAmount = totalAmount + taxAmount
+        // Get business settings to check VAT configuration
+        const businessSettings = await prisma.businessSettings.findFirst({
+            where: { userId: session.user.id }
+        })
+
+        // Calculate tax based on business settings
+        let taxAmount = 0
+        let finalAmount = totalAmount
+
+        if (businessSettings?.enableVat && businessSettings?.vatRate) {
+            const taxRate = businessSettings.vatRate / 100 // Convert percentage to decimal
+            taxAmount = totalAmount * taxRate
+            finalAmount = totalAmount + taxAmount
+        }
 
         // Create sale with items in a transaction
         const sale = await prisma.$transaction(async (tx) => {

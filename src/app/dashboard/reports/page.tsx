@@ -30,6 +30,8 @@ import { toast } from 'sonner'
 interface ProfitLossData {
     period: string
     revenue: number
+    totalRevenue: number
+    totalTax: number
     costOfGoodsSold: number
     grossProfit: number
     operatingExpenses: number
@@ -40,6 +42,8 @@ interface ProfitLossData {
     totalDiscounts: number
     totalBeforeDiscounts: number
     discountPercentage: number
+    vatEnabled: boolean
+    vatRate: number
 }
 
 interface MetricsData {
@@ -192,97 +196,14 @@ export default function ReportsPage() {
 
         } catch (error) {
             console.error('Error fetching reports:', error)
-            toast.error('Failed to fetch reports data - using sample data for demonstration')
+            toast.error('Failed to fetch reports data')
 
-            // Fallback to sample data if APIs are not available
-            setProfitLossData([{
-                period: 'Current Month',
-                revenue: 125000,
-                costOfGoodsSold: 75000,
-                grossProfit: 50000,
-                operatingExpenses: 0,
-                netProfit: 50000,
-                profitMargin: 40,
-                salesCount: 450,
-                averageOrderValue: 278,
-                totalDiscounts: 5000,
-                totalBeforeDiscounts: 130000,
-                discountPercentage: 3.8
-            }])
-
-            setMetricsData({
-                totalRevenue: 125000,
-                totalSales: 450,
-                totalProducts: 342,
-                activeShops: 3,
-                grossProfit: 50000,
-                netProfit: 25000,
-                profitMargin: 20,
-                costOfGoodsSold: 75000,
-                operatingExpenses: 25000,
-                averageOrderValue: 278,
-                revenueGrowth: 15.2,
-                salesGrowth: 8.7,
-                profitGrowth: 12.3,
-                lowStockCount: 5
-            })
-
-            setLowStockItems([
-                {
-                    id: '1',
-                    name: 'Premium Coffee Beans',
-                    sku: 'PCB001',
-                    currentStock: 3,
-                    minStock: 20,
-                    shop: { name: 'Main Store' },
-                    category: { name: 'Beverages' },
-                    stockStatus: 'LOW_STOCK'
-                },
-                {
-                    id: '2',
-                    name: 'Organic Tea Leaves',
-                    sku: 'OTL002',
-                    currentStock: 0,
-                    minStock: 15,
-                    shop: { name: 'Branch Store' },
-                    category: { name: 'Beverages' },
-                    stockStatus: 'OUT_OF_STOCK'
-                }
-            ])
-
-            // Fallback recent sales data
-            setRecentSales([
-                {
-                    id: '1',
-                    saleNumber: 'SALE-001',
-                    finalAmount: 1250,
-                    createdAt: new Date().toISOString(),
-                    customerName: 'Walk-in Customer'
-                },
-                {
-                    id: '2',
-                    saleNumber: 'SALE-002',
-                    finalAmount: 890,
-                    createdAt: new Date(Date.now() - 86400000).toISOString(),
-                    customerName: 'John Banda'
-                }
-            ])
-
-            // Fallback top products data
-            setTopProducts([
-                {
-                    id: '1',
-                    name: 'Sample Product A',
-                    totalSold: 45,
-                    totalRevenue: 6750
-                },
-                {
-                    id: '2',
-                    name: 'Sample Product B',
-                    totalSold: 32,
-                    totalRevenue: 4800
-                }
-            ])
+            // Set empty data on error
+            setProfitLossData([])
+            setMetricsData(null)
+            setLowStockItems([])
+            setRecentSales([])
+            setTopProducts([])
         } finally {
             setLoading(false)
         }
@@ -532,6 +453,23 @@ export default function ReportsPage() {
                                     </CardHeader>
                                     <CardContent>
                                         <div className="space-y-4">
+                                            {/* VAT Status Indicator */}
+                                            {profitLossData[0] && (
+                                                <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 mb-4">
+                                                    <div className="flex items-center justify-between">
+                                                        <span className="text-sm font-medium text-blue-900">
+                                                            VAT Configuration:
+                                                        </span>
+                                                        <span className={`text-sm font-bold ${profitLossData[0].vatEnabled ? 'text-green-600' : 'text-gray-600'}`}>
+                                                            {profitLossData[0].vatEnabled
+                                                                ? `Enabled (${profitLossData[0].vatRate}%)`
+                                                                : 'Disabled (Prices are final)'
+                                                            }
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                            )}
+
                                             <div className="flex justify-between items-center py-2 border-b">
                                                 <span className="font-medium text-lg">Sales Before Discounts</span>
                                                 <span className="font-bold text-lg text-gray-900">
@@ -544,8 +482,29 @@ export default function ReportsPage() {
                                                     ({formatCurrency(profitLossData[0]?.totalDiscounts || 0)})
                                                 </span>
                                             </div>
+
+                                            {/* Show VAT breakdown if enabled */}
+                                            {profitLossData[0]?.vatEnabled && (
+                                                <>
+                                                    <div className="flex justify-between items-center py-2 border-b">
+                                                        <span className="font-medium text-lg">Total Sales (Including VAT)</span>
+                                                        <span className="font-bold text-lg text-gray-900">
+                                                            {formatCurrency(profitLossData[0]?.totalRevenue || 0)}
+                                                        </span>
+                                                    </div>
+                                                    <div className="flex justify-between items-center py-2 border-b">
+                                                        <span className="text-gray-600 ml-4">Less: VAT ({profitLossData[0]?.vatRate}%)</span>
+                                                        <span className="text-red-600">
+                                                            ({formatCurrency(profitLossData[0]?.totalTax || 0)})
+                                                        </span>
+                                                    </div>
+                                                </>
+                                            )}
+
                                             <div className="flex justify-between items-center py-3 border-b font-medium">
-                                                <span className="font-medium text-lg">Net Revenue</span>
+                                                <span className="font-medium text-lg">
+                                                    {profitLossData[0]?.vatEnabled ? 'Net Revenue (Excluding VAT)' : 'Net Revenue'}
+                                                </span>
                                                 <span className="font-bold text-lg text-green-600">
                                                     {formatCurrency(profitLossData[0]?.revenue || 0)}
                                                 </span>
@@ -568,6 +527,8 @@ export default function ReportsPage() {
                                                     {formatCurrency(profitLossData[0]?.netProfit || 0)}
                                                 </span>
                                             </div>
+
+                                            {/* Additional metrics */}
                                             <div className="grid grid-cols-2 gap-4 mt-4">
                                                 <div className="flex justify-between items-center py-2 bg-gray-50 rounded-lg px-4">
                                                     <span className="font-medium">Profit Margin</span>
@@ -582,6 +543,30 @@ export default function ReportsPage() {
                                                     </span>
                                                 </div>
                                             </div>
+
+                                            {/* VAT Summary if enabled */}
+                                            {profitLossData[0]?.vatEnabled && (
+                                                <div className="mt-6 p-4 bg-green-50 border border-green-200 rounded-lg">
+                                                    <h5 className="font-medium text-green-900 mb-2">VAT Summary</h5>
+                                                    <div className="space-y-2 text-sm">
+                                                        <div className="flex justify-between">
+                                                            <span className="text-green-800">VAT Collected:</span>
+                                                            <span className="font-semibold text-green-900">
+                                                                {formatCurrency(profitLossData[0]?.totalTax || 0)}
+                                                            </span>
+                                                        </div>
+                                                        <div className="flex justify-between">
+                                                            <span className="text-green-800">VAT Rate:</span>
+                                                            <span className="font-semibold text-green-900">
+                                                                {profitLossData[0]?.vatRate}%
+                                                            </span>
+                                                        </div>
+                                                        <p className="text-xs text-green-700 mt-2">
+                                                            * VAT collected should be remitted to tax authorities
+                                                        </p>
+                                                    </div>
+                                                </div>
+                                            )}
                                         </div>
                                     </CardContent>
                                 </Card>

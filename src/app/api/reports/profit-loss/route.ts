@@ -99,8 +99,15 @@ export async function GET(request: NextRequest) {
             }
         })
 
-        // Calculate metrics
-        const totalRevenue = sales.reduce((sum, sale) => sum + Number(sale.finalAmount), 0)
+        // Get business settings for VAT and accounting preferences
+        const businessSettings = await prisma.businessSettings.findFirst({
+            where: { userId: session.user.id }
+        })
+
+        // Calculate metrics with proper VAT handling
+        let totalRevenue = 0
+        let totalTax = 0
+        let totalRevenueExcludingTax = 0
         const salesCount = sales.length
 
         // Calculate cost of goods sold and total discounts
@@ -109,6 +116,21 @@ export async function GET(request: NextRequest) {
         let totalBeforeDiscounts = 0
 
         sales.forEach(sale => {
+            // Handle VAT based on business settings
+            const saleRevenue = Number(sale.finalAmount)
+            const saleTax = Number(sale.tax)
+
+            totalRevenue += saleRevenue
+            totalTax += saleTax
+
+            // If VAT is enabled, revenue excluding tax is finalAmount - tax
+            // If VAT is disabled, all amounts are treated as final (VAT inclusive if applicable)
+            if (businessSettings?.enableVat) {
+                totalRevenueExcludingTax += (saleRevenue - saleTax)
+            } else {
+                totalRevenueExcludingTax += saleRevenue
+            }
+
             sale.items.forEach(item => {
                 // Find the cost price from inventory
                 const costPrice = item.product.inventory[0]?.costPrice || 0
@@ -120,20 +142,33 @@ export async function GET(request: NextRequest) {
             })
         })
 
-        const grossProfit = totalRevenue - totalCostOfGoodsSold
+        // Calculate profits based on whether VAT is enabled
+        const revenueForProfitCalculation = businessSettings?.enableVat ? totalRevenueExcludingTax : totalRevenue
+        const grossProfit = revenueForProfitCalculation - totalCostOfGoodsSold
 
-        // For inventory management, net profit = gross profit (Revenue - COGS)
-        // No operating expenses since this is product-focused, not full business accounting
-        const operatingExpenses = 0
-        const netProfit = grossProfit // Net profit is simply the profit from products sold
-        const profitMargin = totalRevenue > 0 ? (netProfit / totalRevenue) * 100 : 0
+        // Operating expenses (if enabled in settings)
+        let operatingExpenses = 0
+        if (businessSettings?.includeOperatingExpenses) {
+            const expenses = await prisma.operatingExpense.findMany({
+                where: {
+                    userId: session.user.id,
+                    ...dateFilter
+                }
+            })
+            operatingExpenses = expenses.reduce((sum, expense) => sum + Number(expense.amount), 0)
+        }
+
+        const netProfit = grossProfit - operatingExpenses
+        const profitMargin = revenueForProfitCalculation > 0 ? (netProfit / revenueForProfitCalculation) * 100 : 0
         const averageOrderValue = salesCount > 0 ? totalRevenue / salesCount : 0
 
         const discountPercentage = totalBeforeDiscounts > 0 ? (totalDiscounts / totalBeforeDiscounts) * 100 : 0
 
         const report = {
             period: period.charAt(0).toUpperCase() + period.slice(1),
-            revenue: totalRevenue,
+            revenue: revenueForProfitCalculation, // Revenue used for profit calculations
+            totalRevenue: totalRevenue, // Total revenue including VAT
+            totalTax: totalTax, // Total VAT/tax collected
             costOfGoodsSold: totalCostOfGoodsSold,
             grossProfit: grossProfit,
             operatingExpenses: operatingExpenses,
@@ -143,7 +178,9 @@ export async function GET(request: NextRequest) {
             averageOrderValue: averageOrderValue,
             totalDiscounts: totalDiscounts,
             totalBeforeDiscounts: totalBeforeDiscounts,
-            discountPercentage: discountPercentage
+            discountPercentage: discountPercentage,
+            vatEnabled: businessSettings?.enableVat || false,
+            vatRate: businessSettings?.vatRate || 0
         }
 
         return NextResponse.json({

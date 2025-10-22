@@ -9,6 +9,7 @@ import { Store, Search, Plus, Eye, Edit, Trash2, MapPin, Phone, Mail, Users, Pac
 import { toast } from 'sonner'
 import { ShopDialog } from '@/components/shops/shop-dialog'
 import { Pagination } from '@/components/ui/pagination'
+import Link from 'next/link'
 
 interface Shop {
     id: string
@@ -107,12 +108,6 @@ export default function ShopsPage() {
     const handlePageSizeChange = (newPageSize: number) => {
         setPageSize(newPageSize)
         setCurrentPage(1)
-    }
-
-    const handleViewShop = (shop: Shop) => {
-        setSelectedShop(shop)
-        setDialogMode('view')
-        setIsShopDialogOpen(true)
     }
 
     const handleEditShop = (shop: Shop) => {
@@ -286,12 +281,10 @@ export default function ShopsPage() {
                                     {/* Actions */}
                                     <div className="flex items-center justify-between">
                                         <div className="flex items-center space-x-1">
-                                            <Button
-                                                variant="outline"
-                                                size="sm"
-                                                onClick={() => handleViewShop(shop)}
-                                            >
-                                                <Eye className="h-4 w-4" />
+                                            <Button asChild variant="outline" size="sm">
+                                                <Link href={`/dashboard/shops/${shop.id}`}>
+                                                    <Eye className="h-4 w-4" />
+                                                </Link>
                                             </Button>
                                             <Button
                                                 variant="outline"

@@ -97,6 +97,13 @@ const sidebarItems = [
         color: "text-purple-600"
     },
     {
+        title: "Expenses",
+        href: "/dashboard/expenses",
+        icon: Receipt,
+        description: "Track operating expenses",
+        color: "text-red-600"
+    },
+    {
         title: "Reports & Analytics",
         href: "/dashboard/reports",
         icon: TrendingUp,
