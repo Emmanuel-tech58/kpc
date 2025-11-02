@@ -19,6 +19,25 @@ interface Shop {
     business: {
         name: string;
     };
+    sales?: Array<{
+        id: string;
+        saleNumber?: string;
+        finalAmount?: number;
+        createdAt?: string;
+        status?: string;
+    }>;
+    inventory?: Array<{
+        id: string;
+        quantity?: number;
+        lastUpdated?: string;
+        product?: { id: string; name?: string; sku?: string; minStock?: number };
+    }>;
+    _count?: {
+        inventory?: number;
+        sales?: number;
+        stockMovements?: number;
+        users?: number;
+    };
 }
 
 interface ShopMetrics {
@@ -38,15 +57,12 @@ export default function ShopDetailsPage() {
 
     useEffect(() => {
         if (shopId) {
-            const loadData = async () => {
+            const load = async () => {
                 setLoading(true)
-                await Promise.all([
-                    fetchShopDetails(),
-                    fetchShopMetrics()
-                ])
+                await fetchShopDetails()
                 setLoading(false)
             }
-            loadData()
+            load()
         }
     }, [shopId])
 
@@ -55,22 +71,24 @@ export default function ShopDetailsPage() {
             const response = await fetch(`/api/shops/${shopId}`)
             if (!response.ok) throw new Error('Failed to fetch shop details')
             const data = await response.json()
-            setShop(data)
+            // API may return the shop directly or wrapped as { shop }
+            const shopData: Shop = data?.shop || data
+            setShop(shopData)
+
+            // compute metrics from shop data
+            const totalRevenue = (shopData.sales || []).reduce((s, sale) => s + (sale.finalAmount || 0), 0)
+            const totalSales = (shopData.sales || []).length || (shopData._count?.sales || 0)
+            const totalProducts = shopData._count?.inventory || (shopData.inventory || []).length
+            const lowStockCount = (shopData.inventory || []).filter(inv => {
+                const qty = inv.quantity || 0
+                const min = inv.product?.minStock || 0
+                return min > 0 ? qty <= min : false
+            }).length
+
+            setMetrics({ totalRevenue, totalSales, totalProducts, lowStockCount })
         } catch (error) {
             console.error(error)
             toast.error('Failed to load shop details.')
-        }
-    }
-
-    const fetchShopMetrics = async () => {
-        try {
-            const response = await fetch(`/api/shops/${shopId}/metrics`)
-            if (!response.ok) throw new Error('Failed to fetch shop metrics')
-            const data = await response.json()
-            setMetrics(data.metrics)
-        } catch (error) {
-            console.error(error)
-            toast.error('Failed to load shop metrics.')
         }
     }
 
@@ -177,7 +195,28 @@ export default function ShopDetailsPage() {
                         <CardTitle>Recent Sales</CardTitle>
                     </CardHeader>
                     <CardContent>
-                        <p>Sales data will be displayed here.</p>
+                        {shop?.sales && shop.sales.length > 0 ? (
+                            <div className="space-y-3">
+                                {shop.sales.slice(0, 10).map((s) => (
+                                    <div key={s.id} className="flex items-center justify-between border rounded p-3">
+                                        <div>
+                                            <div className="font-medium">{s.saleNumber || s.id}</div>
+                                            <div className="text-sm text-gray-500">{s.status || '—'}</div>
+                                        </div>
+                                        <div className="text-right">
+                                            <div className="font-semibold">{formatCurrency(s.finalAmount || 0)}</div>
+                                            <div className="text-xs text-gray-500">{s.createdAt ? new Date(s.createdAt).toLocaleString() : ''}</div>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        ) : (
+                            <div className="text-center py-8 text-gray-500">
+                                <ShoppingCart className="h-12 w-12 mx-auto mb-4 text-gray-300" />
+                                <p className="text-lg font-medium">No recent sales</p>
+                                <p className="text-sm">Sales for this shop will appear here.</p>
+                            </div>
+                        )}
                     </CardContent>
                 </Card>
                 <Card>
@@ -185,7 +224,28 @@ export default function ShopDetailsPage() {
                         <CardTitle>Inventory Overview</CardTitle>
                     </CardHeader>
                     <CardContent>
-                        <p>Inventory details will be displayed here.</p>
+                        {shop?.inventory && shop.inventory.length > 0 ? (
+                            <div className="space-y-3">
+                                {shop.inventory.slice(0, 10).map((inv) => (
+                                    <div key={inv.id} className="flex items-center justify-between border rounded p-3">
+                                        <div>
+                                            <div className="font-medium">{inv.product?.name || inv.product?.id}</div>
+                                            <div className="text-sm text-gray-500">SKU: {inv.product?.sku || '—'}</div>
+                                        </div>
+                                        <div className="text-right">
+                                            <div className={`font-semibold ${inv.quantity === 0 ? 'text-red-600' : ''}`}>{inv.quantity ?? 0}</div>
+                                            <div className="text-xs text-gray-500">{inv.lastUpdated ? new Date(inv.lastUpdated).toLocaleString() : ''}</div>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        ) : (
+                            <div className="text-center py-8 text-gray-500">
+                                <Package className="h-12 w-12 mx-auto mb-4 text-gray-300" />
+                                <p className="text-lg font-medium">No inventory data</p>
+                                <p className="text-sm">Inventory for this shop will appear here.</p>
+                            </div>
+                        )}
                     </CardContent>
                 </Card>
             </div>

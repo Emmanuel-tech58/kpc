@@ -93,6 +93,21 @@ export async function GET(
         return NextResponse.json(shop)
     } catch (error) {
         console.error('Error fetching shop:', error)
+        // Prisma returns P1001 when it can't reach the database
+        // Return a clearer 503 response for that case so it's easier to troubleshoot from the frontend
+        // and avoid leaking internal stack traces.
+        // @ts-ignore - error may be PrismaClientKnownRequestError
+        const code = error?.code
+        if (code === 'P1001') {
+            return NextResponse.json(
+                {
+                    error: 'Database unreachable',
+                    message: 'Could not connect to the database. Check DATABASE_URL and ensure the DB server is running or reachable.'
+                },
+                { status: 503 }
+            )
+        }
+
         return NextResponse.json(
             { error: 'Failed to fetch shop' },
             { status: 500 }

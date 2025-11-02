@@ -52,7 +52,8 @@ export default function SettingsPage() {
         push: true,
         lowStock: true,
         sales: true,
-        reports: false
+        reports: false,
+        whatsapp: false
     })
 
     // Load settings on component mount
@@ -68,6 +69,10 @@ export default function SettingsPage() {
                 const settingsData = await settingsResponse.json()
                 if (settingsData.settings) {
                     setBusinessData(prev => ({ ...prev, ...settingsData.settings }))
+                    // load notifications preferences if present
+                    if (settingsData.settings.notifications) {
+                        setNotifications(prev => ({ ...prev, ...settingsData.settings.notifications }))
+                    }
                 }
             }
 
@@ -102,7 +107,7 @@ export default function SettingsPage() {
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify(businessData)
+                body: JSON.stringify({ ...businessData, notifications })
             })
 
             // Save profile data
@@ -527,6 +532,16 @@ export default function SettingsPage() {
                                             <Switch
                                                 checked={notifications.reports}
                                                 onCheckedChange={(checked) => setNotifications({ ...notifications, reports: checked })}
+                                            />
+                                        </div>
+                                        <div className="flex items-center justify-between">
+                                            <div>
+                                                <h4 className="font-medium">WhatsApp Notifications</h4>
+                                                <p className="text-sm text-gray-600">Receive important alerts via WhatsApp</p>
+                                            </div>
+                                            <Switch
+                                                checked={notifications.whatsapp}
+                                                onCheckedChange={(checked) => setNotifications({ ...notifications, whatsapp: checked })}
                                             />
                                         </div>
                                     </CardContent>

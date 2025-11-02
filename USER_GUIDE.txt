@@ -1,0 +1,129 @@
+KPC — User Guide
+
+Version: 1.0 (User-focused)
+Date: 2025-11-02
+
+Welcome
+-------
+This quick user guide explains how to use the KPC web app to manage shops, inventory, and sales. It's written for end-users (store managers, cashiers, or administrators) — no developer knowledge required.
+
+How to sign in
+--------------
+- Open your browser to the app URL (for local installs: http://localhost:3000).
+- If the app requires authentication, enter your username/email and password. If you don't have an account, contact your administrator.
+
+Main navigation
+---------------
+- Dashboard: Overall business overview and quick actions.
+- Inventory: View and manage products, stock levels and categories.
+- Sales: Create new sales (checkout) and view past transactions.
+- Shops: Manage your physical locations (view, add, edit).
+- Customers: View and add customer records.
+- Users & Roles: (Admins only) Manage users and access levels.
+
+Dashboard overview
+------------------
+The dashboard shows high level metrics:
+- Total Revenue: Money collected during the selected period.
+- Sales Count: Number of transactions.
+- Products in Stock: Total products available across the shop.
+- Low Stock Items: Items that need restocking.
+
+Shops — Manage locations
+------------------------
+Location: Dashboard > Shops
+
+View shops:
+- The Shops page lists each location with address and contact info.
+- Click the eye (View) icon to open the Shop Dashboard for details about that location.
+
+Add a shop:
+- Click "Add Shop".
+- Fill in the shop name, address, phone, email and business association.
+- Save — the shop appears in the list.
+
+Edit a shop:
+- Click the Edit (pencil) icon on a shop card.
+- Update fields, then save.
+
+Deactivate / Delete a shop:
+- Click Delete (trash). If a shop has related sales or inventory the app will typically deactivate it instead of hard-deleting.
+
+Shop Dashboard (per location)
+----------------------------
+Location: Dashboard > Shops > View (eye) a shop
+
+This view shows:
+- Shop header: name, address, contact and Active/Inactive status.
+- Metrics cards: Revenue, Sales, Products in Stock, Low Stock Items.
+- Recent Sales: A short list of latest transactions at that shop.
+- Inventory Overview: Recently updated inventory items and their quantities.
+
+Inventory — Products & Stock
+---------------------------
+View products:
+- Go to Dashboard > Inventory to see the product list.
+- Use filters (category, supplier, stock status) to narrow the list.
+
+Add a product:
+- Click "Add Product" (or similar) and enter product name, SKU, price, and minimum stock.
+- Assign it to a shop or multiple shops if applicable.
+
+Update stock:
+- Use the stock movement dialog to increase or decrease quantities.
+- For quick adjustments, open a product and edit its available quantity.
+
+Sales — Creating a sale (cashier flow)
+------------------------------------
+1. Go to Dashboard > Sales > New Sale.
+2. Select the shop where the sale is happening.
+3. Search and add products to the sale.
+   - When changing the quantity, type the desired number in the quantity input. (If you see a persistent digit like "1" that you can't remove, click inside and replace the whole value — if behavior persists, report the issue to your admin.)
+4. Add customer information (optional) and payment details.
+5. Click "Complete Sale" or "Checkout" — a receipt will be generated.
+
+Customers
+---------
+- Add customer details (name, phone, email) to keep records of buyers.
+- Use customers when creating sales to track purchase history.
+
+Users & Roles (administrators)
+------------------------------
+- Admins can add users, assign roles and control access to parts of the app.
+- Roles allow grouping permissions (e.g., cashier, manager).
+
+Reports
+-------
+- Visit Reports or Dashboard sections to view graphs and summaries for revenue, sales, and inventory.
+- Select a period (day/week/month) and shop to filter data.
+
+Common issues & quick fixes
+--------------------------
+I can't sign in:
+- Ensure your username/email and password are correct. Ask the administrator to reset your password if needed.
+
+The View (eye) button doesn't open a shop:
+- Try refreshing the page. If the problem persists, contact support with the shop name and the date/time you clicked.
+
+Quantity input shows an extra digit (e.g. typing 7 yields 17):
+- Click inside the quantity field and replace the whole value (select all and type the new number).
+- If the issue persists, report the bug to your administrator and include the product name and the steps you took.
+
+I see a "site error" or data missing:
+- Refresh the page and try again.
+- If that doesn't help, capture the error message and contact your administrator.
+
+Where to get help
+-----------------
+- Contact your system administrator or the person who installed KPC for your business.
+- When reporting an issue, include:
+  - What you did (steps to reproduce)
+  - What happened (error messages, screenshots)
+  - Which shop / product / user was involved
+
+Final notes
+-----------
+- This guide covers common user tasks. If you want, I can create a printable Word/PDF version with screenshots for training.
+- If you'd like me to add step-by-step screenshots for the Sales flow or Shop Dashboard, tell me which screens to capture and I'll prepare a ready-to-paste document.
+
+End of user guide

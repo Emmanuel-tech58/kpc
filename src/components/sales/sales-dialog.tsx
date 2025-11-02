@@ -226,7 +226,10 @@ export function SalesDialog({
     }
 
     const calculateItemTotal = (item: any) => {
-        return (item.unitPrice * item.quantity) - item.discount
+        const qty = Number(item.quantity) || 0
+        const price = Number(item.unitPrice) || 0
+        const discount = Number(item.discount) || 0
+        return (price * qty) - discount
     }
 
     const calculateSubTotal = () => {
@@ -505,7 +508,8 @@ export function SalesDialog({
                                                             type="number"
                                                             min="1"
                                                             value={item.quantity}
-                                                            onChange={(e) => updateItem(index, 'quantity', parseInt(e.target.value) || 1)}
+                                                            onChange={(e) => updateItem(index, 'quantity', e.target.value === '' ? '' : parseInt(e.target.value, 10))}
+                                                            onFocus={(e) => (e.target as HTMLInputElement).select()}
                                                             className={errors[`item_${index}_quantity`] ? 'border-red-500' : ''}
                                                         />
                                                     </div>
